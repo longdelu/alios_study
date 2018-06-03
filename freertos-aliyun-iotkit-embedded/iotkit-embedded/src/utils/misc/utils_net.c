@@ -36,12 +36,12 @@ static int write_tcp(utils_network_pt pNetwork, const char *buffer, uint32_t len
 
 static int disconnect_tcp(utils_network_pt pNetwork)
 {
-    if (0 == pNetwork->handle) {
+    if (-1 == pNetwork->handle) {
         return -1;
     }
 
     HAL_TCP_Destroy(pNetwork->handle);
-    pNetwork->handle = 0;
+    pNetwork->handle = -1;
     return 0;
 }
 
@@ -53,7 +53,7 @@ static int connect_tcp(utils_network_pt pNetwork)
     }
 
     pNetwork->handle = HAL_TCP_Establish(pNetwork->pHostAddress, pNetwork->port);
-    if (0 == pNetwork->handle) {
+    if (-1 == pNetwork->handle) {
         return -1;
     }
 
@@ -194,7 +194,7 @@ int iotx_net_init(utils_network_pt pNetwork, const char *host, uint16_t port, co
         pNetwork->ca_crt_len = strlen(ca_crt);
     }
 
-    pNetwork->handle = 0;
+    pNetwork->handle = -1;
     pNetwork->read = utils_net_read;
     pNetwork->write = utils_net_write;
     pNetwork->disconnect = iotx_net_disconnect;
