@@ -19,6 +19,8 @@
 #include "guider_internal.h"
 #include "utils_epoch_time.h"
 
+
+
 const char *secmode_str[] = {
     "TCP + Guider + Plain",
     "TCP + Guider + ID2-Crypto",

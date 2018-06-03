@@ -1,15 +1,14 @@
 
 #include "iot_import.h"
 
-//#include "crypto.h"
-//#include "openssl/x509.h"
-//#include "openssl/pem.h"
-//#include "openssl/ssl.h"
-//#include "openssl/err.h"
+#include "x509.h"
+#include "pem.h"
+#include "ssl.h"
+//#include "err.h"
 
-//static SSL_CTX *ssl_ctx = NULL;
-//static X509_STORE *ca_store = NULL;
-//static X509 *ca = NULL;
+static SSL_CTX *ssl_ctx = NULL;
+static X509_STORE *ca_store = NULL;
+static X509 *ca = NULL;
 
 
 #pragma comment(lib,"libeay32.lib")

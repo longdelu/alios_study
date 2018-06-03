@@ -7,16 +7,16 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdbool.h>
-//#include <sys/time.h>
-//#include "iot_import_dtls.h"
+#include <time.h>
+#include "iot_import_dtls.h"
 
-//#include "ali_crypto.h"
-//#include "mbedtls/config.h"
-//#include "mbedtls/net_sockets.h"
-//#include "mbedtls/debug.h"
-//#include "mbedtls/ssl.h"
-//#include "mbedtls/error.h"
-//#include "mbedtls/timing.h"
+
+#include "config.h"
+#include "net_sockets.h"
+#include "debug.h"
+#include "ssl.h"
+#include "error.h"
+#include "timing.h"
 #ifdef COAP_DTLS_SUPPORT
 
 #define NULL_STR "NULL"
@@ -293,7 +293,7 @@ unsigned int HAL_DTLSSession_create(DTLSContext *context, coap_dtls_options_t  *
 //        DTLS_TRC("mbedtls_ssl_config_defaults result 0x%04x\r\n", result);
 
 //        mbedtls_ssl_conf_rng(&p_dtls_session->conf, mbedtls_ctr_drbg_random, &p_dtls_session->ctr_drbg);
-        mbedtls_ssl_conf_rng(&p_dtls_session->conf, ssl_random, NULL/*&p_dtls_session->ctr_drbg*/);
+//        mbedtls_ssl_conf_rng(&p_dtls_session->conf, ssl_random, NULL/*&p_dtls_session->ctr_drbg*/);
 //        mbedtls_ssl_conf_dbg(&p_dtls_session->conf, DTLSLog_wrapper, NULL);
 //#if defined(MBEDTLS_DEBUG_C)
 //        mbedtls_ssl_conf_dbg(&p_dtls_session->conf, ssl_debug, NULL);

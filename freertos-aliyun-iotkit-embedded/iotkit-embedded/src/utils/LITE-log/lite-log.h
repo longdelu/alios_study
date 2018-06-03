@@ -12,6 +12,8 @@ extern "C" {
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+    
+#define LITE_ASSERT                    assert    
 
 #define LITE_printf                     printf
 #define LITE_sprintf                    sprintf
