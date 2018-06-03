@@ -92,41 +92,41 @@ int unittest_string_utils(void)
 
 int unittest_json_token(void)
 {
-    list_head_t    *key_list = NULL;
-    json_key_t     *pos;
+//    list_head_t    *key_list = NULL;
+//    json_key_t     *pos;
 
-    key_list = LITE_json_keys_of(UNITTEST_JSON_SAMPLE, "");
+//    key_list = LITE_json_keys_of(UNITTEST_JSON_SAMPLE, "");
 
-    list_for_each_entry(pos, key_list, list) {
-        if (pos->key) {
-            char           *val = NULL;
+//    list_for_each_entry(pos, key_list, list) {
+//        if (pos->key) {
+//            char           *val = NULL;
 
-            val = LITE_json_value_of(pos->key, UNITTEST_JSON_SAMPLE);
-            log_info("%-28s: %.48s", pos->key, val);
-            LITE_free(val);
-        }
-    }
-    LITE_json_keys_release(key_list);
+//            val = LITE_json_value_of(pos->key, UNITTEST_JSON_SAMPLE);
+//            log_info("%-28s: %.48s", pos->key, val);
+//            LITE_free(val);
+//        }
+//    }
+//    LITE_json_keys_release(key_list);
 
 
-    /* Demo usage without awareness of json_key_t{} and returned list */
+//    /* Demo usage without awareness of json_key_t{} and returned list */
 
-    char           *sub_objc;
-    void           *ret_list;
-    void           *temp;
-    char           *token;
+//    char           *sub_objc;
+//    void           *ret_list;
+//    void           *temp;
+//    char           *token;
 
-    sub_objc = LITE_json_value_of(UNITTEST_JSON_SUBKEY, UNITTEST_JSON_SAMPLE);
+//    sub_objc = LITE_json_value_of(UNITTEST_JSON_SUBKEY, UNITTEST_JSON_SAMPLE);
 
-    foreach_json_keys_in(sub_objc, token, ret_list, temp) {
-        char       *val;
+//    foreach_json_keys_in(sub_objc, token, ret_list, temp) {
+//        char       *val;
 
-        val = LITE_json_value_of(token, sub_objc);
-        log_info("%s|%-18s: %.48s", UNITTEST_JSON_SUBKEY, token, val);
-        LITE_free(val);
-    }
-    LITE_json_keys_release(ret_list);
-    LITE_free(sub_objc);
+//        val = LITE_json_value_of(token, sub_objc);
+//        log_info("%s|%-18s: %.48s", UNITTEST_JSON_SUBKEY, token, val);
+//        LITE_free(val);
+//    }
+//    LITE_json_keys_release(ret_list);
+//    LITE_free(sub_objc);
 
     return 0;
 }

@@ -21,55 +21,57 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
-#include <memory.h>
-#include <pthread.h>
-#include <unistd.h>
-#include <sys/prctl.h>
-#include <sys/time.h>
+//#include <memory.h>
+#include "malloc.h"
+#include <string.h>
+//#include <pthread.h>
+//#include <unistd.h>
+//#include <sys/prctl.h>
+//#include <sys/time.h>
 
 #include "iot_import.h"
 
 void *HAL_MutexCreate(void)
 {
     int err_num;
-    pthread_mutex_t *mutex = (pthread_mutex_t *)HAL_Malloc(sizeof(pthread_mutex_t));
-    if (NULL == mutex) {
-        return NULL;
-    }
+//    pthread_mutex_t *mutex = (pthread_mutex_t *)HAL_Malloc(sizeof(pthread_mutex_t));
+//    if (NULL == mutex) {
+//        return NULL;
+//    }
 
-    if (0 != (err_num = pthread_mutex_init(mutex, NULL))) {
-        perror("create mutex failed");
-        HAL_Free(mutex);
-        return NULL;
-    }
+//    if (0 != (err_num = pthread_mutex_init(mutex, NULL))) {
+//        perror("create mutex failed");
+//        HAL_Free(mutex);
+//        return NULL;
+//    }
 
-    return mutex;
+//    return mutex;
 }
 
 void HAL_MutexDestroy(_IN_ void *mutex)
 {
-    int err_num;
-    if (0 != (err_num = pthread_mutex_destroy((pthread_mutex_t *)mutex))) {
-        perror("destroy mutex failed");
-    }
+//    int err_num;
+//    if (0 != (err_num = pthread_mutex_destroy((pthread_mutex_t *)mutex))) {
+//        perror("destroy mutex failed");
+//    }
 
-    HAL_Free(mutex);
+//    HAL_Free(mutex);
 }
 
 void HAL_MutexLock(_IN_ void *mutex)
 {
-    int err_num;
-    if (0 != (err_num = pthread_mutex_lock((pthread_mutex_t *)mutex))) {
-        perror("lock mutex failed");
-    }
+//    int err_num;
+//    if (0 != (err_num = pthread_mutex_lock((pthread_mutex_t *)mutex))) {
+//        perror("lock mutex failed");
+//    }
 }
 
 void HAL_MutexUnlock(_IN_ void *mutex)
 {
-    int err_num;
-    if (0 != (err_num = pthread_mutex_unlock((pthread_mutex_t *)mutex))) {
-        perror("unlock mutex failed");
-    }
+//    int err_num;
+//    if (0 != (err_num = pthread_mutex_unlock((pthread_mutex_t *)mutex))) {
+//        perror("unlock mutex failed");
+//    }
 }
 
 void *HAL_Malloc(_IN_ uint32_t size)
@@ -84,28 +86,28 @@ void HAL_Free(_IN_ void *ptr)
 
 uint64_t HAL_UptimeMs(void)
 {
-    uint64_t            time_ms;
-    struct timespec     ts;
+//    uint64_t            time_ms;
+//    struct timespec     ts;
 
-    clock_gettime(CLOCK_MONOTONIC, &ts);
-    time_ms = (ts.tv_sec * 1000) + (ts.tv_nsec / 1000 / 1000);
+//    clock_gettime(CLOCK_MONOTONIC, &ts);
+//    time_ms = (ts.tv_sec * 1000) + (ts.tv_nsec / 1000 / 1000);
 
-    return time_ms;
+//    return time_ms;
 }
 
 void HAL_SleepMs(_IN_ uint32_t ms)
 {
-    usleep(1000 * ms);
+//    usleep(1000 * ms);
 }
 
 void HAL_Srandom(uint32_t seed)
 {
-    srandom(seed);
+//    srandom(seed);
 }
 
 uint32_t HAL_Random(uint32_t region)
 {
-    return (region > 0) ? (random() % region) : 0;
+//    return (region > 0) ? (random() % region) : 0;
 }
 
 int HAL_Snprintf(_IN_ char *str, const int len, const char *fmt, ...)
@@ -127,13 +129,13 @@ int HAL_Vsnprintf(_IN_ char *str, _IN_ const int len, _IN_ const char *format, v
 
 void HAL_Printf(_IN_ const char *fmt, ...)
 {
-    va_list args;
+//    va_list args;
 
-    va_start(args, fmt);
-    vprintf(fmt, args);
-    va_end(args);
+//    va_start(args, fmt);
+//    vprintf(fmt, args);
+//    va_end(args);
 
-    fflush(stdout);
+//    fflush(stdout);
 }
 
 int HAL_GetPartnerID(char pid_str[PID_STRLEN_MAX])

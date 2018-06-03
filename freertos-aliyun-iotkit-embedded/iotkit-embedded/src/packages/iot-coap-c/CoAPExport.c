@@ -219,7 +219,7 @@ void CoAPContext_free(CoAPContext *p_ctx)
 
     CoAPNetwork_deinit(&p_ctx->network);
 
-    list_for_each_entry_safe(cur, next, &p_ctx->list.sendlist, sendlist, CoAPSendNode) {
+    list_for_each_entry_safe(cur, next, &p_ctx->list.sendlist, CoAPSendNode, sendlist) {
         if (NULL != cur) {
             if (NULL != cur->message) {
                 coap_free(cur->message);

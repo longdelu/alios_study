@@ -318,14 +318,14 @@ int CoAPMessage_send(CoAPContext *context, CoAPMessage *message)
 
 static int CoAPAckMessage_handle(CoAPContext *context, CoAPMessage *message)
 {
-    CoAPSendNode *node = NULL;
+//    CoAPSendNode *node = NULL;
 
-    list_for_each_entry(node, &context->list.sendlist, sendlist, CoAPSendNode) {
-        if (node->msgid == message->header.msgid) {
-            node->acked = 1;
-            return COAP_SUCCESS;
-        }
-    }
+//    list_for_each_entry(node, &context->list.sendlist, sendlist) {
+//        if (node->msgid == message->header.msgid) {
+//            node->acked = 1;
+//            return COAP_SUCCESS;
+//        }
+//    }
 
     return COAP_SUCCESS;
 }
@@ -340,40 +340,40 @@ static int CoAPAckMessage_send(CoAPContext *context, unsigned short msgid)
 
 static int CoAPRespMessage_handle(CoAPContext *context, CoAPMessage *message)
 {
-    CoAPSendNode *node = NULL;
+//    CoAPSendNode *node = NULL;
 
-    if (COAP_MESSAGE_TYPE_CON == message->header.type) {
-        CoAPAckMessage_send(context, message->header.msgid);
-    }
+//    if (COAP_MESSAGE_TYPE_CON == message->header.type) {
+//        CoAPAckMessage_send(context, message->header.msgid);
+//    }
 
 
-    list_for_each_entry(node, &context->list.sendlist, sendlist, CoAPSendNode) {
-        if (0 != node->tokenlen && node->tokenlen == message->header.tokenlen
-            && 0 == memcmp(node->token, message->token, message->header.tokenlen)) {
+//    list_for_each_entry(node, &context->list.sendlist, sendlist) {
+//        if (0 != node->tokenlen && node->tokenlen == message->header.tokenlen
+//            && 0 == memcmp(node->token, message->token, message->header.tokenlen)) {
 
-            COAP_DEBUG("Find the node by token");
-            message->user  = node->user;
-            if (COAP_MSG_CODE_400_BAD_REQUEST <= message->header.code) {
-                /* TODO:i */
-                if (NULL != context->notifier) {
-                    context->notifier(message->header.code, message);
-                }
-            }
+//            COAP_DEBUG("Find the node by token");
+//            message->user  = node->user;
+//            if (COAP_MSG_CODE_400_BAD_REQUEST <= message->header.code) {
+//                /* TODO:i */
+//                if (NULL != context->notifier) {
+//                    context->notifier(message->header.code, message);
+//                }
+//            }
 
-            if (NULL != node->handler) {
-                node->handler(node->user, message);
-            }
-            COAP_DEBUG("Remove the message id %d from list", node->msgid);
-            list_del_init(&node->sendlist);
-            context->list.count--;
-            if (NULL != node->message) {
-                coap_free(node->message);
-            }
-            coap_free(node);
-            node = NULL;
-            return COAP_SUCCESS;
-        }
-    }
+//            if (NULL != node->handler) {
+//                node->handler(node->user, message);
+//            }
+//            COAP_DEBUG("Remove the message id %d from list", node->msgid);
+//            list_del_init(&node->sendlist);
+//            context->list.count--;
+//            if (NULL != node->message) {
+//                coap_free(node->message);
+//            }
+//            coap_free(node);
+//            node = NULL;
+//            return COAP_SUCCESS;
+//        }
+//    }
     return COAP_ERROR_NOT_FOUND;
 }
 
@@ -438,48 +438,48 @@ int CoAPMessage_recv(CoAPContext *context, unsigned int timeout, int readcount)
 
 int CoAPMessage_cycle(CoAPContext *context)
 {
-    unsigned int ret = 0;
-    CoAPMessage_recv(context, context->waittime, 0);
+//    unsigned int ret = 0;
+//    CoAPMessage_recv(context, context->waittime, 0);
 
-    CoAPSendNode *node = NULL, *next = NULL;
-    list_for_each_entry_safe(node, next, &context->list.sendlist, sendlist, CoAPSendNode) {
-        if (NULL != node) {
-            if (node->timeout == 0) {
-                if (node->retrans_count < COAP_MAX_RETRY_COUNT && (0 == node->acked)) {
-                    node->timeout     = node->timeout_val * 2;
-                    node->timeout_val = node->timeout;
-                    node->retrans_count++;
-                    COAP_DEBUG("Retansmit the message id %d len %d", node->msgid, node->msglen);
-                    ret = CoAPNetwork_write(&context->network, node->message, node->msglen);
-                    if (ret != COAP_SUCCESS) {
-                        if (NULL != context->notifier) {
-                            /* TODO: */
-                            /* context->notifier(context, event); */
-                        }
-                    }
-                }
+//    CoAPSendNode *node = NULL, *next = NULL;
+//    list_for_each_entry_safe(node, next, &context->list.sendlist, sendlist, CoAPSendNode) {
+//        if (NULL != node) {
+//            if (node->timeout == 0) {
+//                if (node->retrans_count < COAP_MAX_RETRY_COUNT && (0 == node->acked)) {
+//                    node->timeout     = node->timeout_val * 2;
+//                    node->timeout_val = node->timeout;
+//                    node->retrans_count++;
+//                    COAP_DEBUG("Retansmit the message id %d len %d", node->msgid, node->msglen);
+//                    ret = CoAPNetwork_write(&context->network, node->message, node->msglen);
+//                    if (ret != COAP_SUCCESS) {
+//                        if (NULL != context->notifier) {
+//                            /* TODO: */
+//                            /* context->notifier(context, event); */
+//                        }
+//                    }
+//                }
 
-                if ((node->timeout > COAP_MAX_TRANSMISSION_SPAN) ||
-                    (node->retrans_count >= COAP_MAX_RETRY_COUNT)) {
-                    if (NULL != context->notifier) {
-                        /* TODO: */
-                        /* context->notifier(context, event); */
-                    }
+//                if ((node->timeout > COAP_MAX_TRANSMISSION_SPAN) ||
+//                    (node->retrans_count >= COAP_MAX_RETRY_COUNT)) {
+//                    if (NULL != context->notifier) {
+//                        /* TODO: */
+//                        /* context->notifier(context, event); */
+//                    }
 
-                    /*Remove the node from the list*/
-                    list_del_init(&node->sendlist);
-                    context->list.count--;
-                    COAP_INFO("Retransmit timeout,remove the message id %d count %d",
-                              node->msgid, context->list.count);
-                    coap_free(node->message);
-                    coap_free(node);
-                }
-            }
-             else {
-                node->timeout--;
-            }
-        }
-    }
+//                    /*Remove the node from the list*/
+//                    list_del_init(&node->sendlist);
+//                    context->list.count--;
+//                    COAP_INFO("Retransmit timeout,remove the message id %d count %d",
+//                              node->msgid, context->list.count);
+//                    coap_free(node->message);
+//                    coap_free(node);
+//                }
+//            }
+//             else {
+//                node->timeout--;
+//            }
+//        }
+//    }
     return COAP_SUCCESS;
 }
 

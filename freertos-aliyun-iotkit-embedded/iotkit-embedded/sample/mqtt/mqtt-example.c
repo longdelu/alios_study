@@ -428,7 +428,7 @@ do_exit:
 }
 #endif
 
-int main(int argc, char **argv)
+int mqtt_main(int argc, char **argv)
 {
     IOT_OpenLog("mqtt");
     IOT_SetLogLevel(IOT_LOG_DEBUG);

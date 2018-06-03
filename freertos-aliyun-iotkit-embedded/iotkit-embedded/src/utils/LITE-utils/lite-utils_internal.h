@@ -16,5 +16,6 @@
 
 #include "lite-utils_config.h"
 #include "lite-utils.h"
+#include "lite-list.h"
 
 #endif  /* __LITE_UTILS_INTERNAL_H__ */
