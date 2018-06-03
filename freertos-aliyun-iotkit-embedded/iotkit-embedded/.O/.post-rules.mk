@@ -1,0 +1,15 @@
+target-g:/AliOS/aliyun-iotkit-embedded/iotkit-embedded/sample:; @true
+target-g:/AliOS/aliyun-iotkit-embedded/iotkit-embedded/src/coap:; @true
+target-g:/AliOS/aliyun-iotkit-embedded/iotkit-embedded/src/guider:; @true
+target-g:/AliOS/aliyun-iotkit-embedded/iotkit-embedded/src/http:; @true
+target-g:/AliOS/aliyun-iotkit-embedded/iotkit-embedded/src/log:; @true
+target-g:/AliOS/aliyun-iotkit-embedded/iotkit-embedded/src/mqtt:; @true
+target-g:/AliOS/aliyun-iotkit-embedded/iotkit-embedded/src/ota:; @true
+target-g:/AliOS/aliyun-iotkit-embedded/iotkit-embedded/src/platform:; @true
+target-g:/AliOS/aliyun-iotkit-embedded/iotkit-embedded/src/sdk-impl:; @true
+target-g:/AliOS/aliyun-iotkit-embedded/iotkit-embedded/src/sdk-tests:; @true
+target-g:/AliOS/aliyun-iotkit-embedded/iotkit-embedded/src/shadow:; @true
+target-g:/AliOS/aliyun-iotkit-embedded/iotkit-embedded/src/system:; @true
+target-g:/AliOS/aliyun-iotkit-embedded/iotkit-embedded/src/tfs:; @true
+target-g:/AliOS/aliyun-iotkit-embedded/iotkit-embedded/src/tls:; @true
+target-g:/AliOS/aliyun-iotkit-embedded/iotkit-embedded/src/utils:; @true
