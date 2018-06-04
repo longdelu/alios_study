@@ -27,79 +27,98 @@
 //#include <pthread.h>
 //#include <unistd.h>
 //#include <sys/prctl.h>
-//#include <sys/time.h>
+#include <time.h>
 
 #include "FreeRTOS.h"
 #include "task.h"
+#include "semphr.h"
 #include "iot_import.h"
+
+#define HAL_OS_DEBUG                   
+
+#ifdef HAL_OS_DEBUG
+#define HAL_OS_DEBUG_INFO(...)    (int)printf(__VA_ARGS__)
+#else
+#define HAL_OS_DEBUG_INFO(...)
+#endif
+
+
 
 void *HAL_MutexCreate(void)
 {
-    int err_num;
-//    pthread_mutex_t *mutex = (pthread_mutex_t *)HAL_Malloc(sizeof(pthread_mutex_t));
-//    if (NULL == mutex) {
-//        return NULL;
-//    }
+   
+    //互斥信号量句柄
+    SemaphoreHandle_t MutexSemaphore ;	
+    
+    //创建互斥信号量, 动态创建并进行了初始化
+	MutexSemaphore=xSemaphoreCreateMutex();
+    
+    if (NULL == MutexSemaphore) {
+        HAL_OS_DEBUG_INFO("create mutex failed");
+        return NULL;
+    }
 
-//    if (0 != (err_num = pthread_mutex_init(mutex, NULL))) {
-//        perror("create mutex failed");
-//        HAL_Free(mutex);
-//        return NULL;
-//    }
 
-//    return mutex;
+    return MutexSemaphore;
 }
 
 void HAL_MutexDestroy(_IN_ void *mutex)
 {
-//    int err_num;
-//    if (0 != (err_num = pthread_mutex_destroy((pthread_mutex_t *)mutex))) {
-//        perror("destroy mutex failed");
-//    }
-
-//    HAL_Free(mutex);
+   
+    vSemaphoreDelete(mutex);
+    
 }
 
 void HAL_MutexLock(_IN_ void *mutex)
 {
-//    int err_num;
-//    if (0 != (err_num = pthread_mutex_lock((pthread_mutex_t *)mutex))) {
-//        perror("lock mutex failed");
-//    }
+    int err_num;
+    
+    err_num = xSemaphoreTake(mutex,portMAX_DELAY);	//获取互斥信号量    
+    
+    if (pdTRUE != err_num) {
+        HAL_OS_DEBUG_INFO("lock mutex failed");
+    }
 }
 
 void HAL_MutexUnlock(_IN_ void *mutex)
 {
-//    int err_num;
-//    if (0 != (err_num = pthread_mutex_unlock((pthread_mutex_t *)mutex))) {
-//        perror("unlock mutex failed");
-//    }
+    int err_num;
+    
+    err_num = xSemaphoreGive(mutex);					//释放互斥信号量
+    
+    if (pdTRUE != err_num) {
+        HAL_OS_DEBUG_INFO("unlock mutex failed");
+    }
 }
 
 void *HAL_Malloc(_IN_ uint32_t size)
 {
-    return malloc(size);
+    return pvPortMalloc(size);
 }
 
 void HAL_Free(_IN_ void *ptr)
 {
-    free(ptr);
+    vPortFree(ptr);
 }
+
+TickType_t freertos_sys_time_get(void)
+{
+    return (TickType_t)(xTaskGetTickCount() * 1000 / configTICK_RATE_HZ);
+}
+
+uint64_t freertos_now_ms(void)
+{
+    return freertos_sys_time_get();
+}
+
 
 uint64_t HAL_UptimeMs(void)
 {
-//    uint64_t            time_ms;
-//    struct timespec     ts;
-
-//    clock_gettime(CLOCK_MONOTONIC, &ts);
-//    time_ms = (ts.tv_sec * 1000) + (ts.tv_nsec / 1000 / 1000);
-
-//    return time_ms;
+    return freertos_now_ms();
 }
 
 void HAL_SleepMs(_IN_ uint32_t ms)
 {
-//    usleep(1000 * ms);
     
     TickType_t xDelay = ms / portTICK_PERIOD_MS;
     
@@ -109,12 +128,12 @@ void HAL_SleepMs(_IN_ uint32_t ms)
 
 void HAL_Srandom(uint32_t seed)
 {
-//    srandom(seed);
+   srand(seed);
 }
 
 uint32_t HAL_Random(uint32_t region)
 {
-//    return (region > 0) ? (random() % region) : 0;
+    return (region > 0) ? (rand() % region) : 0;
 }
 
 int HAL_Snprintf(_IN_ char *str, const int len, const char *fmt, ...)
@@ -135,16 +154,17 @@ int HAL_Vsnprintf(_IN_ char *str, _IN_ const int len, _IN_ const char *format, v
 }
 
 
+/* 以宏的方式移植 */
 // #define HAL_Printf(_IN_ const char *fmt, ...)
 //{
 //    
 //    va_list args;
 
 //    va_start(args, fmt);
-////    vprintf(fmt, args);
+//    vprintf(fmt, args);
 //    va_end(args);
 //    
-////    fflush(stdout);
+//    fflush(stdout);
 //    
 //}
 
