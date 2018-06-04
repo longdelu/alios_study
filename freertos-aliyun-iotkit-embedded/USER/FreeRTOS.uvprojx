@@ -335,7 +335,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F429xx OTA_SIGNAL_CHANNEL</Define>
               <Undefine></Undefine>
-              <IncludePath>..\CORE;..\OBJ;..\USER;..\HALLIB\STM32F4xx_HAL_Driver\Inc;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\HARDWARE\LED;..\HARDWARE\LCD;..\HARDWARE\KEY;..\HARDWARE\SDRAM;..\HARDWARE\TIMER;..\HARDWARE\IIC;..\HARDWARE\PCF8574;..\FreeRTOS\include;..\FreeRTOS\portable\RVDS\ARM_CM4F;..\MALLOC;..\iotkit-embedded\src\log;..\iotkit-embedded\src\mqtt;..\iotkit-embedded\src\mqtt\MQTTPacket;..\iotkit-embedded\src\coap;..\iotkit-embedded\src\packages\iot-coap-c;..\iotkit-embedded\src\guider;..\iotkit-embedded\src\ota;..\iotkit-embedded\src\platform\os\freertos;..\iotkit-embedded\src\platform\ssl\freertos-mbedtls;..\iotkit-embedded\src\platform\ssl\freertos-openssl;..\iotkit-embedded\src\shadow;..\iotkit-embedded\src\system;..\iotkit-embedded\sample;..\iotkit-embedded\sample\coap;..\iotkit-embedded\sample\mqtt;..\iotkit-embedded\sample\http;..\iotkit-embedded\sample\device-shadow;..\iotkit-embedded\sample\ota;..\iotkit-embedded\src\utils\digest;..\iotkit-embedded\src\utils\misc;..\iotkit-embedded\src\utils\LITE-log;..\iotkit-embedded\src\utils\LITE-utils;..\iotkit-embedded\src\sdk-impl;..\iotkit-embedded\src\sdk-impl\exports;..\iotkit-embedded\src\sdk-impl\imports;..\iotkit-embedded\src\tfs;..\iotkit-embedded\src\platform\ssl\freertos_mbedtls_include</IncludePath>
+              <IncludePath>..\CORE;..\OBJ;..\USER;..\HALLIB\STM32F4xx_HAL_Driver\Inc;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\HARDWARE\LED;..\HARDWARE\LCD;..\HARDWARE\KEY;..\HARDWARE\SDRAM;..\HARDWARE\TIMER;..\HARDWARE\IIC;..\HARDWARE\PCF8574;..\FreeRTOS\include;..\FreeRTOS\portable\RVDS\ARM_CM4F;..\MALLOC;..\iotkit-embedded\src\log;..\iotkit-embedded\src\mqtt;..\iotkit-embedded\src\mqtt\MQTTPacket;..\iotkit-embedded\src\coap;..\iotkit-embedded\src\packages\iot-coap-c;..\iotkit-embedded\src\guider;..\iotkit-embedded\src\ota;..\iotkit-embedded\src\platform\os\freertos;..\iotkit-embedded\src\platform\ssl\freertos-mbedtls;..\iotkit-embedded\src\platform\ssl\freertos-openssl;..\iotkit-embedded\src\shadow;..\iotkit-embedded\src\system;..\iotkit-embedded\sample;..\iotkit-embedded\sample\coap;..\iotkit-embedded\sample\mqtt;..\iotkit-embedded\sample\http;..\iotkit-embedded\sample\device-shadow;..\iotkit-embedded\sample\ota;..\iotkit-embedded\src\utils\digest;..\iotkit-embedded\src\utils\misc;..\iotkit-embedded\src\utils\LITE-log;..\iotkit-embedded\src\utils\LITE-utils;..\iotkit-embedded\src\sdk-impl;..\iotkit-embedded\src\sdk-impl\exports;..\iotkit-embedded\src\sdk-impl\imports;..\iotkit-embedded\src\tfs;..\iotkit-embedded\src\platform\ssl\freertos_mbedtls_include;..\iotkit-embedded\src\utils\cjson\include;..\iotkit-embedded\src\utils\digest_algorithm</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1053,6 +1053,21 @@
                   </Cads>
                 </FileArmAds>
               </FileOption>
+            </File>
+            <File>
+              <FileName>cJSON.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\iotkit-embedded\src\utils\cjson\cJSON.c</FilePath>
+            </File>
+            <File>
+              <FileName>CheckSumUtils.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\iotkit-embedded\src\utils\digest_algorithm\CheckSumUtils.c</FilePath>
+            </File>
+            <File>
+              <FileName>md5.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\iotkit-embedded\src\utils\digest_algorithm\md5.c</FilePath>
             </File>
           </Files>
         </Group>

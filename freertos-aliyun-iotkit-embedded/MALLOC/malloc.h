@@ -27,20 +27,22 @@
 
 #define SRAMBANK 	3	//定义支持的SRAM块数.	
 
+#define MALLOC_SYS                     (0x000)
+
 
 //mem1内存参数设定.mem1完全处于内部SRAM里面.
 #define MEM1_BLOCK_SIZE			64  	  						//内存块大小为64字节
-#define MEM1_MAX_SIZE			100*1024  						//最大管理内存 160K
+#define MEM1_MAX_SIZE			100*1024 - MALLOC_SYS  			//最大管理内存 160K
 #define MEM1_ALLOC_TABLE_SIZE	MEM1_MAX_SIZE/MEM1_BLOCK_SIZE 	//内存表大小
 
 //mem2内存参数设定.mem2的内存池处于外部SDRAM里面
 #define MEM2_BLOCK_SIZE			64  	  						//内存块大小为64字节
-#define MEM2_MAX_SIZE			28912 *1024  					//最大管理内存28912K
+#define MEM2_MAX_SIZE			28912 *1024 - MALLOC_SYS  		//最大管理内存28912K
 #define MEM2_ALLOC_TABLE_SIZE	MEM2_MAX_SIZE/MEM2_BLOCK_SIZE 	//内存表大小
 		 
 //mem3内存参数设定.mem3处于CCM,用于管理CCM(特别注意,这部分SRAM,仅CPU可以访问!!)
 #define MEM3_BLOCK_SIZE			64  	  						//内存块大小为64字节
-#define MEM3_MAX_SIZE			60 *1024  						//最大管理内存60K
+#define MEM3_MAX_SIZE			60 *1024 - MALLOC_SYS  			//最大管理内存60K
 #define MEM3_ALLOC_TABLE_SIZE	MEM3_MAX_SIZE/MEM3_BLOCK_SIZE 	//内存表大小
 		 
 

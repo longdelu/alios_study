@@ -13,14 +13,16 @@
 ////////////////////////////////////////////////////////////////////////////////// 	 
 
 
+
+
 //内存池(32字节对齐)
 __align(32) u8 mem1base[MEM1_MAX_SIZE];													//内部SRAM内存池
-__align(32) u8 mem2base[MEM2_MAX_SIZE] __attribute__((at(0XC01F4000)));					//外部SDRAM内存池,前面2M给LTDC用了(1280*800*2)
-__align(32) u8 mem3base[MEM3_MAX_SIZE] __attribute__((at(0X10000000)));					//内部CCM内存池
+__align(32) u8 mem2base[MEM2_MAX_SIZE] __attribute__((at(0XC01F4000 + MALLOC_SYS)));	//外部SDRAM内存池,前面2M给LTDC用了(1280*800*2)
+__align(32) u8 mem3base[MEM3_MAX_SIZE] __attribute__((at(0X10000000 + MALLOC_SYS)));	//内部CCM内存池
 //内存管理表
 u32 mem1mapbase[MEM1_ALLOC_TABLE_SIZE];													//内部SRAM内存池MAP
-u32 mem2mapbase[MEM2_ALLOC_TABLE_SIZE] __attribute__((at(0XC01F4000+MEM2_MAX_SIZE)));	//外部SRAM内存池MAP
-u32 mem3mapbase[MEM3_ALLOC_TABLE_SIZE] __attribute__((at(0X10000000+MEM3_MAX_SIZE)));	//内部CCM内存池MAP
+u32 mem2mapbase[MEM2_ALLOC_TABLE_SIZE] __attribute__((at(0XC01F4000 + MALLOC_SYS  + MEM2_MAX_SIZE)));	//外部SRAM内存池MAP
+u32 mem3mapbase[MEM3_ALLOC_TABLE_SIZE] __attribute__((at(0X10000000+ + MALLOC_SYS + MEM3_MAX_SIZE)));	//内部CCM内存池MAP
 //内存管理参数	   
 const u32 memtblsize[SRAMBANK]={MEM1_ALLOC_TABLE_SIZE,MEM2_ALLOC_TABLE_SIZE,MEM3_ALLOC_TABLE_SIZE};	//内存表大小
 const u32 memblksize[SRAMBANK]={MEM1_BLOCK_SIZE,MEM2_BLOCK_SIZE,MEM3_BLOCK_SIZE};					//内存分块大小
@@ -62,6 +64,7 @@ void my_mem_init(u8 memx)
     mymemset(mallco_dev.memmap[memx],0,memtblsize[memx]*4);	//内存状态表数据清零  
  	mallco_dev.memrdy[memx]=1;								//内存管理初始化OK  
 }  
+
 //获取内存使用率
 //memx:所属内存块
 //返回值:使用率(扩大了10倍,0~1000,代表0.0%~100.0%)
