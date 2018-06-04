@@ -11,6 +11,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "semphr.h"
+#include "iot_import.h"
 /************************************************
  ALIENTEK 阿波罗STM32F429开发板 FreeRTOS实验14-4
  FreeRTOS互斥信号量操作实验-HAL库版本
@@ -144,9 +145,9 @@ void high_task(void *pvParameters)
 	{
 		vTaskDelay(500);	//延时500ms，也就是500个时钟节拍	
 		num++;
-		printf("high task Pend Sem\r\n");
+		HAL_Printf("high task Pend Sem\r\n");
 		xSemaphoreTake(MutexSemaphore,portMAX_DELAY);	//获取互斥信号量
-		printf("high task Running!\r\n");
+		HAL_Printf("high task Running!\r\n");
 		LCD_Fill(6,131,114,313,lcd_discolor[num%14]); 	//填充区域
 		LED1=!LED1;
 		xSemaphoreGive(MutexSemaphore);					//释放信号量
@@ -167,7 +168,7 @@ void middle_task(void *pvParameters)
 	while(1)
 	{
 		num++;
-		printf("middle task Running!\r\n");
+		HAL_Printf("middle task Running!\r\n");
 		LCD_Fill(126,131,233,313,lcd_discolor[13-num%14]); //填充区域
 		LED0=!LED0;
         vTaskDelay(1000);	//延时1s，也就是1000个时钟节拍	
@@ -182,7 +183,7 @@ void low_task(void *pvParameters)
 	while(1)
 	{
 		xSemaphoreTake(MutexSemaphore,portMAX_DELAY);	//获取互斥信号量
-		printf("low task Running!\r\n");
+		HAL_Printf("low task Running!\r\n");
 		for(times=0;times<20000000;times++)				//模拟低优先级任务占用互斥信号量
 		{
 			taskYIELD();								//发起任务调度

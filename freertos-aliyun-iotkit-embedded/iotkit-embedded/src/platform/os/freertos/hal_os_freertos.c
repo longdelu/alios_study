@@ -29,6 +29,8 @@
 //#include <sys/prctl.h>
 //#include <sys/time.h>
 
+#include "FreeRTOS.h"
+#include "task.h"
 #include "iot_import.h"
 
 void *HAL_MutexCreate(void)
@@ -98,6 +100,11 @@ uint64_t HAL_UptimeMs(void)
 void HAL_SleepMs(_IN_ uint32_t ms)
 {
 //    usleep(1000 * ms);
+    
+    TickType_t xDelay = ms / portTICK_PERIOD_MS;
+    
+    vTaskDelay( xDelay);
+        
 }
 
 void HAL_Srandom(uint32_t seed)
@@ -127,16 +134,19 @@ int HAL_Vsnprintf(_IN_ char *str, _IN_ const int len, _IN_ const char *format, v
     return vsnprintf(str, len, format, ap);
 }
 
-void HAL_Printf(_IN_ const char *fmt, ...)
-{
+
+// #define HAL_Printf(_IN_ const char *fmt, ...)
+//{
+//    
 //    va_list args;
 
 //    va_start(args, fmt);
-//    vprintf(fmt, args);
+////    vprintf(fmt, args);
 //    va_end(args);
-
-//    fflush(stdout);
-}
+//    
+////    fflush(stdout);
+//    
+//}
 
 int HAL_GetPartnerID(char pid_str[PID_STRLEN_MAX])
 {

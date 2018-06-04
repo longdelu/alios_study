@@ -182,7 +182,7 @@ uint32_t HAL_Random(_IN_ uint32_t region);
  * @see None.
  * @note None.
  */
-void HAL_Printf(_IN_ const char *fmt, ...);
+#define HAL_Printf(...)     (int)printf(__VA_ARGS__)
 
 /**
  * @brief Writes formatted data to string.
