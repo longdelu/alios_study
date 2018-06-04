@@ -40,14 +40,7 @@
 
 static uint64_t _linux_get_time_ms(void)
 {
-//    struct timeval tv = { 0 };
-//    uint64_t time_ms;
-
-//    gettimeofday(&tv, NULL);
-
-//    time_ms = tv.tv_sec * 1000 + tv.tv_usec / 1000;
-
-//    return time_ms;
+    return HAL_UptimeMs();
 }
 
 static uint64_t _linux_time_left(uint64_t t_end, uint64_t t_now)

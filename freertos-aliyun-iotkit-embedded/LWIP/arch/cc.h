@@ -22,14 +22,14 @@ typedef int sys_prot_t;				//临界保护型数据
 //当定义了OS_CRITICAL_METHOD时就说明使用了UCOS II
 #if OS_CRITICAL_METHOD == 1
 #define SYS_ARCH_DECL_PROTECT(lev)
-#define SYS_ARCH_PROTECT(lev)		CPU_INT_DIS()
-#define SYS_ARCH_UNPROTECT(lev)		CPU_INT_EN()
+#define SYS_ARCH_PROTECT(lev)		taskENTER_CRITICAL()
+#define SYS_ARCH_UNPROTECT(lev)		taskEXIT_CRITICAL()
 #endif
 
 #if OS_CRITICAL_METHOD == 3  
 #define SYS_ARCH_DECL_PROTECT(lev)	u32_t lev
-#define SYS_ARCH_PROTECT(lev)		lev = OS_CPU_SR_Save() 	//UCOS II中进入临界区,关中断
-#define SYS_ARCH_UNPROTECT(lev)		OS_CPU_SR_Restore(lev)	//UCOS II中退出A临界区，开中断 
+#define SYS_ARCH_PROTECT(lev)		lev = taskENTER_CRITICAL_FROM_ISR() 	//UCOS II中进入临界区,关中断
+#define SYS_ARCH_UNPROTECT(lev)		taskEXIT_CRITICAL_FROM_ISR(lev)	        //UCOS II中退出A临界区，开中断 
 #endif
 
 //根据不同的编译器定义一些符号
