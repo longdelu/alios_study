@@ -90,7 +90,7 @@ static int disconnect_ssl(utils_network_pt pNetwork)
     }
 
     HAL_SSL_Destroy((uintptr_t)pNetwork->handle);
-    pNetwork->handle = 0;
+    pNetwork->handle = -1;
 
     return 0;
 }
@@ -102,7 +102,7 @@ static int connect_ssl(utils_network_pt pNetwork)
         return 1;
     }
 
-    if (0 != (pNetwork->handle = (intptr_t)HAL_SSL_Establish(
+    if (-1 != (pNetwork->handle = (intptr_t)HAL_SSL_Establish(
                                      pNetwork->pHostAddress,
                                      pNetwork->port,
                                      pNetwork->ca_crt,
