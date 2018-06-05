@@ -15,7 +15,7 @@
         <TargetCommonOption>
           <Device>STM32F429IGTx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.2.11.0</PackID>
+          <PackID>Keil.STM32F4xx_DFP.2.9.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IROM(0x08000000,0x100000) IRAM(0x20000000,0x30000) IRAM2(0x10000000,0x10000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -335,7 +335,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F429xx OTA_SIGNAL_CHANNEL</Define>
               <Undefine></Undefine>
-              <IncludePath>..\CORE;..\OBJ;..\USER;..\HALLIB\STM32F4xx_HAL_Driver\Inc;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\HARDWARE\LED;..\HARDWARE\LCD;..\HARDWARE\KEY;..\HARDWARE\SDRAM;..\HARDWARE\TIMER;..\HARDWARE\IIC;..\HARDWARE\PCF8574;..\FreeRTOS\include;..\FreeRTOS\portable\RVDS\ARM_CM4F;..\MALLOC;..\iotkit-embedded\src\log;..\iotkit-embedded\src\mqtt;..\iotkit-embedded\src\mqtt\MQTTPacket;..\iotkit-embedded\src\coap;..\iotkit-embedded\src\packages\iot-coap-c;..\iotkit-embedded\src\guider;..\iotkit-embedded\src\ota;..\iotkit-embedded\src\platform\os\freertos;..\iotkit-embedded\src\platform\ssl\freertos-mbedtls;..\iotkit-embedded\src\platform\ssl\freertos-openssl;..\iotkit-embedded\src\shadow;..\iotkit-embedded\src\system;..\iotkit-embedded\sample;..\iotkit-embedded\sample\coap;..\iotkit-embedded\sample\mqtt;..\iotkit-embedded\sample\http;..\iotkit-embedded\sample\device-shadow;..\iotkit-embedded\sample\ota;..\iotkit-embedded\src\utils\digest;..\iotkit-embedded\src\utils\misc;..\iotkit-embedded\src\utils\LITE-log;..\iotkit-embedded\src\utils\LITE-utils;..\iotkit-embedded\src\sdk-impl;..\iotkit-embedded\src\sdk-impl\exports;..\iotkit-embedded\src\sdk-impl\imports;..\iotkit-embedded\src\tfs;..\iotkit-embedded\src\platform\ssl\freertos_mbedtls_include;..\iotkit-embedded\src\utils\cjson\include;..\iotkit-embedded\src\utils\digest_algorithm;..\LWIP\lwip-1.4.1\src\include\netif;..\LWIP\lwip-1.4.1\src\include\ipv4;..\LWIP\lwip-1.4.1\src\include;..\LWIP\arch;..\LWIP\lwip_app\lwip_comm;..\LWIP</IncludePath>
+              <IncludePath>..\CORE;..\OBJ;..\USER;..\HALLIB\STM32F4xx_HAL_Driver\Inc;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\HARDWARE\LED;..\HARDWARE\LCD;..\HARDWARE\KEY;..\HARDWARE\SDRAM;..\HARDWARE\TIMER;..\HARDWARE\IIC;..\HARDWARE\PCF8574;..\FreeRTOS\include;..\FreeRTOS\portable\RVDS\ARM_CM4F;..\MALLOC;..\iotkit-embedded\src\log;..\iotkit-embedded\src\mqtt;..\iotkit-embedded\src\mqtt\MQTTPacket;..\iotkit-embedded\src\coap;..\iotkit-embedded\src\packages\iot-coap-c;..\iotkit-embedded\src\guider;..\iotkit-embedded\src\ota;..\iotkit-embedded\src\platform\os\freertos;..\iotkit-embedded\src\platform\ssl\freertos-mbedtls;..\iotkit-embedded\src\platform\ssl\freertos-openssl;..\iotkit-embedded\src\shadow;..\iotkit-embedded\src\system;..\iotkit-embedded\sample;..\iotkit-embedded\sample\coap;..\iotkit-embedded\sample\mqtt;..\iotkit-embedded\sample\http;..\iotkit-embedded\sample\device-shadow;..\iotkit-embedded\sample\ota;..\iotkit-embedded\src\utils\digest;..\iotkit-embedded\src\utils\misc;..\iotkit-embedded\src\utils\LITE-log;..\iotkit-embedded\src\utils\LITE-utils;..\iotkit-embedded\src\sdk-impl;..\iotkit-embedded\src\sdk-impl\exports;..\iotkit-embedded\src\sdk-impl\imports;..\iotkit-embedded\src\tfs;..\iotkit-embedded\src\platform\ssl\freertos_mbedtls_include;..\iotkit-embedded\src\utils\cjson\include;..\iotkit-embedded\src\utils\digest_algorithm;..\LWIP\lwip-1.4.1\src\include\netif;..\LWIP\lwip-1.4.1\src\include\ipv4;..\LWIP\lwip-1.4.1\src\include;..\LWIP\arch;..\LWIP\lwip_app\lwip_comm;..\LWIP;..\HARDWARE\LAN8720</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -529,6 +529,11 @@
               <FileType>1</FileType>
               <FilePath>..\HALLIB\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_tim_ex.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f4xx_hal_eth.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HALLIB\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_eth.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -593,6 +598,11 @@
               <FileName>timer.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\TIMER\timer.c</FilePath>
+            </File>
+            <File>
+              <FileName>lan8720.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\LAN8720\lan8720.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -65,12 +65,12 @@ static u16_t s_nextthread = 0;
 //size:邮箱大小
 //返回值:ERR_OK,创建成功
 //         其他,创建失败
-err_t sys_mbox_new( sys_mbox_t *mbox, int size)
+err_t sys_mbox_new(sys_mbox_t mbox, int size)
 {
 	
 	( void ) size;
 	
-	*mbox = xQueueCreate( archMESG_QUEUE_LENGTH, sizeof( void * ) );
+	mbox = xQueueCreate(archMESG_QUEUE_LENGTH, sizeof( void * ) );
 
 #if SYS_STATS
       ++lwip_stats.sys.mbox.used;
@@ -79,13 +79,13 @@ err_t sys_mbox_new( sys_mbox_t *mbox, int size)
 	  }
 #endif /* SYS_STATS */
 
-	return mbox;
+	return ERR_OK;
 } 
 //释放并删除一个消息邮箱
 //*mbox:要删除的消息邮箱
-void sys_mbox_free(sys_mbox_t *mbox)
+void sys_mbox_free(sys_mbox_t mbox)
 {
-	if( uxQueueMessagesWaiting(*mbox) )
+	if( uxQueueMessagesWaiting(mbox) )
 	{
 		/* Line for breakpoint.  Should never break here! */
 		portNOP();
@@ -105,9 +105,9 @@ void sys_mbox_free(sys_mbox_t *mbox)
 //向消息邮箱中发送一条消息(必须发送成功)
 //*mbox:消息邮箱
 //*msg:要发送的消息
-void sys_mbox_post(sys_mbox_t *mbox,void *msg)
+void sys_mbox_post(sys_mbox_t mbox,void *msg)
 {    
-	while (xQueueSendToBack(*mbox, &msg, portMAX_DELAY ) != pdTRUE )
+	while (xQueueSendToBack(mbox, &msg, portMAX_DELAY ) != pdTRUE )
     {
 		;
 	}
@@ -119,11 +119,11 @@ void sys_mbox_post(sys_mbox_t *mbox,void *msg)
 //*msg:要发送的消息
 //返回值:ERR_OK,发送OK
 // 	     ERR_MEM,发送失败
-err_t sys_mbox_trypost(sys_mbox_t *mbox, void *msg)
+err_t sys_mbox_trypost(sys_mbox_t mbox, void *msg)
 { 
     err_t result;
 
-    if (xQueueSend(*mbox, &msg, 0 ) == pdPASS )
+    if (xQueueSend(mbox, &msg, 0 ) == pdPASS )
     {
         result = ERR_OK;
      }
@@ -147,7 +147,7 @@ err_t sys_mbox_trypost(sys_mbox_t *mbox, void *msg)
 //timeout:超时时间，如果timeout为0的话,就一直等待
 //返回值:当timeout不为0时如果成功的话就返回等待的时间，
 //		失败的话就返回超时SYS_ARCH_TIMEOUT
-u32_t sys_arch_mbox_fetch(sys_mbox_t *mbox, void **msg, u32_t timeout)
+u32_t sys_arch_mbox_fetch(sys_mbox_t mbox, void **msg, u32_t timeout)
 { 
     void *dummyptr;
     portTickType StartTime, EndTime, Elapsed;
@@ -161,7 +161,7 @@ u32_t sys_arch_mbox_fetch(sys_mbox_t *mbox, void **msg, u32_t timeout)
 		
 	if ( timeout != 0 )
 	{
-		if ( pdTRUE == xQueueReceive(*mbox, &(*msg), timeout / portTICK_RATE_MS ) )
+		if ( pdTRUE == xQueueReceive(mbox, &(*msg), timeout / portTICK_RATE_MS ) )
 		{
 			EndTime = xTaskGetTickCount();
 			Elapsed = (EndTime - StartTime) * portTICK_RATE_MS;
@@ -177,7 +177,7 @@ u32_t sys_arch_mbox_fetch(sys_mbox_t *mbox, void **msg, u32_t timeout)
 	}
 	else // block forever for a message.
 	{
-		while( pdTRUE != xQueueReceive(*mbox, &(*msg), portMAX_DELAY ) ){} // time is arbitrary
+		while( pdTRUE != xQueueReceive(mbox, &(*msg), portMAX_DELAY ) ){} // time is arbitrary
 		EndTime = xTaskGetTickCount();
 		Elapsed = (EndTime - StartTime) * portTICK_RATE_MS;
 		
@@ -188,7 +188,7 @@ u32_t sys_arch_mbox_fetch(sys_mbox_t *mbox, void **msg, u32_t timeout)
 //*mbox:消息邮箱
 //*msg:消息
 //返回值:等待消息所用的时间/SYS_ARCH_TIMEOUT
-u32_t sys_arch_mbox_tryfetch(sys_mbox_t *mbox, void **msg)
+u32_t sys_arch_mbox_tryfetch(sys_mbox_t mbox, void **msg)
 {
 //	return sys_arch_mbox_fetch(mbox,msg,1);//尝试获取一个消息
 	
@@ -199,7 +199,7 @@ u32_t sys_arch_mbox_tryfetch(sys_mbox_t *mbox, void **msg)
 		msg = &dummyptr;
 	}
 
-	if ( pdTRUE == xQueueReceive(*mbox, &(*msg), 0 ) )
+	if ( pdTRUE == xQueueReceive(mbox, &(*msg), 0 ) )
 	{
 	  return ERR_OK;
 	}
@@ -212,9 +212,9 @@ u32_t sys_arch_mbox_tryfetch(sys_mbox_t *mbox, void **msg)
 //*mbox:消息邮箱
 //返回值:1,有效.
 //      0,无效
-int sys_mbox_valid(sys_mbox_t *mbox)
+int sys_mbox_valid(sys_mbox_t mbox)
 {  
-	sys_mbox_t m_box=*mbox;
+	sys_mbox_t m_box=mbox;
 	u8_t ucErr;
 	int ret;
 	
@@ -224,16 +224,16 @@ int sys_mbox_valid(sys_mbox_t *mbox)
 } 
 //设置一个消息邮箱为无效
 //*mbox:消息邮箱
-void sys_mbox_set_invalid(sys_mbox_t *mbox)
+void sys_mbox_set_invalid(sys_mbox_t mbox)
 {
-	*mbox=NULL;
+	mbox=NULL;
 } 
 //创建一个信号量
 //*sem:创建的信号量
 //count:信号量值
 //返回值:ERR_OK,创建OK
 // 	     ERR_MEM,创建失败
-err_t sys_sem_new(sys_sem_t * sem, u8_t count)
+err_t sys_sem_new(sys_sem_t sem, u8_t count)
 {  
 	xSemaphoreHandle  xSemaphore;
 
@@ -246,7 +246,7 @@ err_t sys_sem_new(sys_sem_t * sem, u8_t count)
       ++lwip_stats.sys.sem.err;
 #endif /* SYS_STATS */
 			
-		return SYS_SEM_NULL;	// TODO need assert
+		return ERR_MEM;	// TODO need assert
 	}
 	
 	if(count == 0)	// Means it can't be taken
@@ -261,64 +261,75 @@ err_t sys_sem_new(sys_sem_t * sem, u8_t count)
 	}
 #endif /* SYS_STATS */
 		
-	return xSemaphore;
+	return ERR_OK;
 } 
 //等待一个信号量
 //*sem:要等待的信号量
 //timeout:超时时间
 //返回值:当timeout不为0时如果成功的话就返回等待的时间，
 //		失败的话就返回超时SYS_ARCH_TIMEOUT
-u32_t sys_arch_sem_wait(sys_sem_t *sem, u32_t timeout)
+u32_t sys_arch_sem_wait(sys_sem_t sem, u32_t timeout)
 { 
-	u8_t ucErr;
-	u32_t ucos_timeout, timeout_new; 
-	if(	timeout!=0) 
+    portTickType StartTime, EndTime, Elapsed;
+
+	StartTime = xTaskGetTickCount();
+
+	if(	timeout != 0)
 	{
-		ucos_timeout = (timeout * OS_TICKS_PER_SEC) / 1000;//转换为节拍数,因为UCOS延时使用的是节拍数,而LWIP是用ms
-		if(ucos_timeout < 1)
-		ucos_timeout = 1;
-	}else ucos_timeout = 0; 
-	timeout = OSTimeGet();  
-	OSSemPend (*sem,(u16_t)ucos_timeout, (u8_t *)&ucErr);
- 	if(ucErr == OS_ERR_TIMEOUT)timeout=SYS_ARCH_TIMEOUT;//请求超时	
-	else
-	{     
- 		timeout_new = OSTimeGet(); 
-		if (timeout_new>=timeout) timeout_new = timeout_new - timeout;
-		else timeout_new = 0xffffffff - timeout + timeout_new;
- 		timeout = (timeout_new*1000/OS_TICKS_PER_SEC + 1);//算出请求消息或使用的时间(ms)
+		if( xSemaphoreTake( sem, timeout / portTICK_RATE_MS ) == pdTRUE )
+		{
+			EndTime = xTaskGetTickCount();
+			Elapsed = (EndTime - StartTime) * portTICK_RATE_MS;
+			
+			return (Elapsed); // return time blocked TODO test	
+		}
+		else
+		{
+			return SYS_ARCH_TIMEOUT;
+		}
 	}
-	return timeout;
+	else // must block without a timeout
+	{
+		while( xSemaphoreTake( sem, portMAX_DELAY ) != pdTRUE ){}
+		EndTime = xTaskGetTickCount();
+		Elapsed = (EndTime - StartTime) * portTICK_RATE_MS;
+
+		return ( Elapsed ); // return time blocked	
+		
+	}
 }
 //发送一个信号量
 //sem:信号量指针
-void sys_sem_signal(sys_sem_t *sem)
+void sys_sem_signal(sys_sem_t sem)
 {
-	OSSemPost(*sem);
+	xSemaphoreGive(sem);
 }
 //释放并删除一个信号量
 //sem:信号量指针
-void sys_sem_free(sys_sem_t *sem)
+void sys_sem_free(sys_sem_t sem)
 {
-	u8_t ucErr;
-	(void)OSSemDel(*sem,OS_DEL_ALWAYS,&ucErr );
-	if(ucErr!=OS_ERR_NONE)LWIP_ASSERT("OSSemDel ",ucErr==OS_ERR_NONE);
-	*sem = NULL;
+#if SYS_STATS
+      --lwip_stats.sys.sem.used;
+#endif /* SYS_STATS */
+			
+	vQueueDelete(sem);
+    
 } 
 //查询一个信号量的状态,无效或有效
 //sem:信号量指针
 //返回值:1,有效.
 //      0,无效
-int sys_sem_valid(sys_sem_t *sem)
+int sys_sem_valid(sys_sem_t sem)
 {
-	OS_SEM_DATA  sem_data;
-	return (OSSemQuery (*sem,&sem_data) == OS_ERR_NONE )? 1:0;              
+	return 1;              
 } 
 //设置一个信号量无效
 //sem:信号量指针
-void sys_sem_set_invalid(sys_sem_t *sem)
+void sys_sem_set_invalid(sys_sem_t sem)
 {
-	*sem=NULL;
+	sem=NULL;
+    
+    
 } 
 //arch初始化
 void sys_init(void)
@@ -334,9 +345,9 @@ void sys_init(void)
 	}
 
 	// keep track of how many threads have been created
-	s_nextthread = 0;事情
+	s_nextthread = 0;
 } 
-extern OS_STK * TCPIP_THREAD_TASK_STK;//TCP IP内核任务堆栈,在lwip_comm函数定义
+
 //创建一个新进程
 //*name:进程名称
 //thred:进程任务函数
@@ -345,29 +356,37 @@ extern OS_STK * TCPIP_THREAD_TASK_STK;//TCP IP内核任务堆栈,在lwip_comm函数定义
 //prio:进程任务的优先级
 sys_thread_t sys_thread_new(const char *name, lwip_thread_fn thread, void *arg, int stacksize, int prio)
 {
-	OS_CPU_SR cpu_sr;
-	if(strcmp(name,TCPIP_THREAD_NAME)==0)//创建TCP IP内核任务
-	{
-		OS_ENTER_CRITICAL();  //进入临界区 
-		OSTaskCreate(thread,arg,(OS_STK*)&TCPIP_THREAD_TASK_STK[stacksize-1],prio);//创建TCP IP内核任务 
-		OS_EXIT_CRITICAL();  //退出临界区
-	} 
-	return 0;
-} 
-//lwip延时函数
-//ms:要延时的ms数
-void sys_msleep(u32_t ms)
-{
-	delay_ms(ms);
+    xTaskHandle CreatedTask;
+    int result;
+
+    if ( s_nextthread < SYS_THREAD_MAX )
+    {
+      result = xTaskCreate( thread, name, stacksize, arg, prio, &CreatedTask );
+
+       // For each task created, store the task handle (pid) in the timers array.
+       // This scheme doesn't allow for threads to be deleted
+       s_timeoutlist[s_nextthread++].pid = CreatedTask;
+
+       if(result == pdPASS)
+       {
+           return CreatedTask;
+       }
+       else
+       {
+           return NULL;
+       }
+    }
+    else
+    {
+      return NULL;
+    }
 }
+
 //获取系统时间,LWIP1.4.1增加的函数
 //返回值:当前系统时间(单位:毫秒)
 u32_t sys_now(void)
-{
-	u32_t ucos_time, lwip_time;
-	ucos_time=OSTimeGet();	//获取当前系统时间 得到的是UCOS的节拍数
-	lwip_time=(ucos_time*1000/OS_TICKS_PER_SEC+1);//将节拍数转换为LWIP的时间MS
-	return lwip_time; 		//返回lwip_time;
+{         
+	return freertos_now_ms(); 	//返回lwip_time;
 }
 
 

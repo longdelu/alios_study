@@ -99,7 +99,9 @@
 #define TCPIP_THREAD_STACKSIZE          1000	//内核任务堆栈大小
 #define DEFAULT_UDP_RECVMBOX_SIZE       2000
 #define DEFAULT_THREAD_STACKSIZE        configMINIMAL_STACK_SIZE
-#define SYS_DEFAULT_THREAD_STACK_DEPTH	 configMINIMAL_STACK_SIZE
+
+/** \brief 使用第三种任务优先级 */
+#define  OS_CRITICAL_METHOD              3u
 
 
 //LWIP调试选项

@@ -1287,6 +1287,18 @@ BaseType_t xTaskResumeAll( void ) PRIVILEGED_FUNCTION;
  */
 TickType_t xTaskGetTickCount( void ) PRIVILEGED_FUNCTION;
 
+
+/**
+ * task. h
+ * <PRE>uint64_t freertos_now_ms;</PRE>
+ *
+ * @return The time total since the system start,the unit ms
+ *
+ * \defgroup freertos_now_ms freertos_now_ms
+ * \ingroup TaskUtils
+ */
+uint64_t freertos_now_ms(void);
+
 /**
  * task. h
  * <PRE>TickType_t xTaskGetTickCountFromISR( void );</PRE>

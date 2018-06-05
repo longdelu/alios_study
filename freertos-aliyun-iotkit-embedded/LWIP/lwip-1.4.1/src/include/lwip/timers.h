@@ -62,7 +62,7 @@ extern "C" {
  *
  * @param arg Additional argument to pass to the function - set up by sys_timeout()
  */
-typedef void (* sys_timeout_handler)(void *arg);
+typedef void (*sys_timeout_handler)(void *arg);
 
 struct sys_timeo {
   struct sys_timeo *next;

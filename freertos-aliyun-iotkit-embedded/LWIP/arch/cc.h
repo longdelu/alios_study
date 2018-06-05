@@ -18,8 +18,8 @@ typedef signed     long    s32_t;   //有符号32位整数
 typedef u32_t mem_ptr_t;            //内存地址型数据
 typedef int sys_prot_t;				//临界保护型数据
 
-//使用操作系统时的临界区保护，这里以UCOS II为例
-//当定义了OS_CRITICAL_METHOD时就说明使用了UCOS II
+//使用操作系统时的临界区保护，
+//当定义了OS_CRITICAL_METHOD时就说明使用了操作系统
 #if OS_CRITICAL_METHOD == 1
 #define SYS_ARCH_DECL_PROTECT(lev)
 #define SYS_ARCH_PROTECT(lev)		taskENTER_CRITICAL()
@@ -28,8 +28,8 @@ typedef int sys_prot_t;				//临界保护型数据
 
 #if OS_CRITICAL_METHOD == 3  
 #define SYS_ARCH_DECL_PROTECT(lev)	u32_t lev
-#define SYS_ARCH_PROTECT(lev)		lev = taskENTER_CRITICAL_FROM_ISR() 	//UCOS II中进入临界区,关中断
-#define SYS_ARCH_UNPROTECT(lev)		taskEXIT_CRITICAL_FROM_ISR(lev)	        //UCOS II中退出A临界区，开中断 
+#define SYS_ARCH_PROTECT(lev)		lev = taskENTER_CRITICAL_FROM_ISR() 	//进入临界区,关中断
+#define SYS_ARCH_UNPROTECT(lev)		taskEXIT_CRITICAL_FROM_ISR(lev)	        //退出临界区，开中断 
 #endif
 
 //根据不同的编译器定义一些符号

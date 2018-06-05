@@ -15,6 +15,8 @@
 #include "usart.h" 
 #include "pcf8574.h"
 #include <stdio.h>
+#include "includes.h"
+
 //////////////////////////////////////////////////////////////////////////////////	 
 //本程序只供学习使用，未经作者许可，不得用于其它任何用途
 //ALIENTEK STM32F429开发板
@@ -42,15 +44,22 @@ extern u8_t *ram_heap;					//在mem.c里面定义.
 //lwip两个任务定义(内核任务和DHCP任务)
 
 //lwip内核任务堆栈(优先级和堆栈大小在lwipopts.h定义了) 
-OS_STK * TCPIP_THREAD_TASK_STK;	 
+StackType_t *TCPIP_THREAD_TASK_STK;	 
+
+TaskHandle_t Tcpip_xHandle = NULL;
+StaticTask_t xTcpipTaskBuffer;
+
+TaskHandle_t Dhcp_xHandle = NULL;
+StaticTask_t xDhcpTaskBuffer;
 
 //lwip DHCP任务
 //设置任务优先级
 #define LWIP_DHCP_TASK_PRIO       		7
+
 //设置任务堆栈大小
 #define LWIP_DHCP_STK_SIZE  		    128
 //任务堆栈，采用内存管理的方式控制申请	
-OS_STK * LWIP_DHCP_TASK_STK;	
+StackType_t *LWIP_DHCP_TASK_STK;	
 //任务函数
 void lwip_dhcp_task(void *pdata); 
 
@@ -174,16 +183,28 @@ u8 lwip_comm_init(void)
 //创建DHCP任务
 void lwip_comm_dhcp_creat(void)
 {
-	OS_CPU_SR cpu_sr;
-	OS_ENTER_CRITICAL();  //进入临界区
-	OSTaskCreate(lwip_dhcp_task,(void*)0,(OS_STK*)&LWIP_DHCP_TASK_STK[LWIP_DHCP_STK_SIZE-1],LWIP_DHCP_TASK_PRIO);//创建DHCP任务 
-	OS_EXIT_CRITICAL();  //退出临界区
+    
+	SYS_ARCH_DECL_PROTECT(lev);
+    
+    SYS_ARCH_PROTECT(lev);   //进入临界区
+    
+    //创建DHCP任务
+    Dhcp_xHandle = xTaskCreateStatic(
+                      lwip_dhcp_task,           // Function that implements the task.
+                      "NAME",                   // Text name for the task.
+                      LWIP_DHCP_STK_SIZE - 4,   // Stack size in words, not bytes.
+                      (void*)0,                 // Parameter passed into the task.
+                      LWIP_DHCP_TASK_PRIO,      // Priority at which the task is created.
+                      LWIP_DHCP_TASK_STK,       // Array to use as the task's stack.
+                      &xTcpipTaskBuffer );      // Variable to hold the task's data structure.
+                      
+	SYS_ARCH_UNPROTECT(lev);  //退出临界区
 }
 //删除DHCP任务
 void lwip_comm_dhcp_delete(void)
 {
 	dhcp_stop(&lwip_netif); 		//关闭DHCP
-	OSTaskDel(LWIP_DHCP_TASK_PRIO);	//删除DHCP任务
+	vTaskDelete(Dhcp_xHandle);	    //删除DHCP任务
 }
 //DHCP处理任务
 void lwip_dhcp_task(void *pdata)

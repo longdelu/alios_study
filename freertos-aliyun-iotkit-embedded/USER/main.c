@@ -126,6 +126,7 @@ void start_task(void *pvParameters)
                 (void*          )NULL,
                 (UBaseType_t    )LOW_TASK_PRIO,
                 (TaskHandle_t*  )&LowTask_Handler);
+                
     vTaskDelete(StartTask_Handler); //删除开始任务
     taskEXIT_CRITICAL();            //退出临界区
 }

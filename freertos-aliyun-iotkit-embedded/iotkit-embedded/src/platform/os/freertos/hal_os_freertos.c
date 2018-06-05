@@ -101,16 +101,6 @@ void HAL_Free(_IN_ void *ptr)
     vPortFree(ptr);
 }
 
-TickType_t freertos_sys_time_get(void)
-{
-    return (TickType_t)(xTaskGetTickCount() * 1000 / configTICK_RATE_HZ);
-}
-
-uint64_t freertos_now_ms(void)
-{
-    return freertos_sys_time_get();
-}
-
 
 uint64_t HAL_UptimeMs(void)
 {
