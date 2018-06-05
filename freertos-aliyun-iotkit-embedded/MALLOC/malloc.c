@@ -89,7 +89,7 @@ u32 my_mem_malloc(u8 memx,u32 size)
     if(size==0)return 0XFFFFFFFF;//不需要分配
     nmemb=size/memblksize[memx];  	//获取需要分配的连续内存块数
     if(size%memblksize[memx])nmemb++;  
-    for(offset=memtblsize[memx]-1;offset>=0;offset--)//搜索整个内存控制区  
+    for(offset=memtblsize[memx]-1;offset>=0;offset--)//搜索整个内存控制区内存控制块，内存块是从后往前拷  
     {     
 		if(!mallco_dev.memmap[memx][offset])cmemb++;//连续空内存块数增加
 		else cmemb=0;								//连续内存块清零
@@ -99,7 +99,7 @@ u32 my_mem_malloc(u8 memx,u32 size)
             {  
                 mallco_dev.memmap[memx][offset+i]=nmemb;  
             }  
-            return (offset*memblksize[memx]);//返回偏移地址  
+            return (offset*memblksize[memx]);//返回偏移地址，一个块的长度* 偏移  
 		}
     }  
     return 0XFFFFFFFF;//未找到符合分配条件的内存块  

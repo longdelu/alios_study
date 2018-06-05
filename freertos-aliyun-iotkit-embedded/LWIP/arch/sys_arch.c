@@ -44,11 +44,20 @@
 #include "malloc.h"
 
 
-//当消息指针为空时,指向一个常量pvNullPointer所指向的值.
-//在UCOS中如果OSQPost()中的msg==NULL会返回一条OS_ERR_POST_NULL
-//错误,而在lwip中会调用sys_mbox_post(mbox,NULL)发送一条空消息,我们
-//在本函数中把NULL变成一个常量指针0Xffffffff
-const void * const pvNullPointer = (mem_ptr_t*)0xffffffff;
+xTaskHandle xTaskGetCurrentTaskHandle( void ) PRIVILEGED_FUNCTION;
+
+struct timeoutlist
+{
+	struct sys_timeouts timeouts;
+	xTaskHandle pid;
+};
+
+/* This is the number of threads that can be started with sys_thread_new() */
+#define SYS_THREAD_MAX 6
+
+static struct timeoutlist s_timeoutlist[SYS_THREAD_MAX];
+static u16_t s_nextthread = 0;
+
  
 
 //创建一个消息邮箱
@@ -58,39 +67,50 @@ const void * const pvNullPointer = (mem_ptr_t*)0xffffffff;
 //         其他,创建失败
 err_t sys_mbox_new( sys_mbox_t *mbox, int size)
 {
-	(*mbox)=mymalloc(SRAMIN,sizeof(TQ_DESCR));	//为消息邮箱申请内存
-	mymemset((*mbox),0,sizeof(TQ_DESCR)); 		//清除mbox的内存
-	if(*mbox)//内存分配成功
-	{
-		if(size>MAX_QUEUE_ENTRIES)size=MAX_QUEUE_ENTRIES;		//消息队列最多容纳MAX_QUEUE_ENTRIES消息数目 
- 		(*mbox)->pQ=OSQCreate(&((*mbox)->pvQEntries[0]),size);  //使用UCOS创建一个消息队列
-		LWIP_ASSERT("OSQCreate",(*mbox)->pQ!=NULL); 
-		if((*mbox)->pQ!=NULL)return ERR_OK;  //返回ERR_OK,表示消息队列创建成功 ERR_OK=0
-		else
-		{ 
-			myfree(SRAMIN,(*mbox));
-			return ERR_MEM;  		//消息队列创建错误
-		}
-	}else return ERR_MEM; 			//消息队列创建错误 
+	
+	( void ) size;
+	
+	*mbox = xQueueCreate( archMESG_QUEUE_LENGTH, sizeof( void * ) );
+
+#if SYS_STATS
+      ++lwip_stats.sys.mbox.used;
+      if (lwip_stats.sys.mbox.max < lwip_stats.sys.mbox.used) {
+         lwip_stats.sys.mbox.max = lwip_stats.sys.mbox.used;
+	  }
+#endif /* SYS_STATS */
+
+	return mbox;
 } 
 //释放并删除一个消息邮箱
 //*mbox:要删除的消息邮箱
-void sys_mbox_free(sys_mbox_t * mbox)
+void sys_mbox_free(sys_mbox_t *mbox)
 {
-	u8_t ucErr;
-	sys_mbox_t m_box=*mbox;   
-	(void)OSQDel(m_box->pQ,OS_DEL_ALWAYS,&ucErr);
-	LWIP_ASSERT( "OSQDel ",ucErr == OS_ERR_NONE ); 
-	myfree(SRAMIN,m_box); 
-	*mbox=NULL;
+	if( uxQueueMessagesWaiting(*mbox) )
+	{
+		/* Line for breakpoint.  Should never break here! */
+		portNOP();
+#if SYS_STATS
+	    lwip_stats.sys.mbox.err++;
+#endif /* SYS_STATS */
+			
+		// TODO notify the user of failure.
+	}
+
+	vQueueDelete( mbox );
+
+#if SYS_STATS
+     --lwip_stats.sys.mbox.used;
+#endif /* SYS_STATS */
 }
 //向消息邮箱中发送一条消息(必须发送成功)
 //*mbox:消息邮箱
 //*msg:要发送的消息
 void sys_mbox_post(sys_mbox_t *mbox,void *msg)
 {    
-	if(msg==NULL)msg=(void*)&pvNullPointer;//当msg为空时 msg等于pvNullPointer指向的值 
-	while(OSQPost((*mbox)->pQ,msg)!=OS_ERR_NONE);//死循环等待消息发送成功 
+	while (xQueueSendToBack(*mbox, &msg, portMAX_DELAY ) != pdTRUE )
+    {
+		;
+	}
 }
 //尝试向一个消息邮箱发送消息
 //此函数相对于sys_mbox_post函数只发送一次消息，
@@ -101,9 +121,24 @@ void sys_mbox_post(sys_mbox_t *mbox,void *msg)
 // 	     ERR_MEM,发送失败
 err_t sys_mbox_trypost(sys_mbox_t *mbox, void *msg)
 { 
-	if(msg==NULL)msg=(void*)&pvNullPointer;//当msg为空时 msg等于pvNullPointer指向的值 
-	if((OSQPost((*mbox)->pQ, msg))!=OS_ERR_NONE)return ERR_MEM;
-	return ERR_OK;
+    err_t result;
+
+    if (xQueueSend(*mbox, &msg, 0 ) == pdPASS )
+    {
+        result = ERR_OK;
+     }
+     else 
+	 {
+        // could not post, queue must be full
+        result = ERR_MEM;
+			
+#if SYS_STATS
+        lwip_stats.sys.mbox.err++;
+#endif /* SYS_STATS */
+			
+     }
+
+     return result;
 }
 
 //等待邮箱中的消息
@@ -114,32 +149,40 @@ err_t sys_mbox_trypost(sys_mbox_t *mbox, void *msg)
 //		失败的话就返回超时SYS_ARCH_TIMEOUT
 u32_t sys_arch_mbox_fetch(sys_mbox_t *mbox, void **msg, u32_t timeout)
 { 
-	u8_t ucErr;
-	u32_t ucos_timeout,timeout_new;
-	void *temp;
-	sys_mbox_t m_box=*mbox;
-	if(timeout!=0)
+    void *dummyptr;
+    portTickType StartTime, EndTime, Elapsed;
+
+	StartTime = xTaskGetTickCount();
+
+	if ( msg == NULL )
 	{
-		ucos_timeout=(timeout*OS_TICKS_PER_SEC)/1000; //转换为节拍数,因为UCOS延时使用的是节拍数,而LWIP是用ms
-		if(ucos_timeout<1)ucos_timeout=1;//至少1个节拍
-	}else ucos_timeout = 0; 
-	timeout = OSTimeGet(); //获取系统时间 
-	temp=OSQPend(m_box->pQ,(u16_t)ucos_timeout,&ucErr); //请求消息队列,等待时限为ucos_timeout
-	if(msg!=NULL)
-	{	
-		if(temp==(void*)&pvNullPointer)*msg = NULL;   	//因为lwip发送空消息的时候我们使用了pvNullPointer指针,所以判断pvNullPointer指向的值
- 		else *msg=temp;									//就可知道请求到的消息是否有效
-	}    
-	if(ucErr==OS_ERR_TIMEOUT)timeout=SYS_ARCH_TIMEOUT;  //请求超时
-	else
-	{
-		LWIP_ASSERT("OSQPend ",ucErr==OS_ERR_NONE); 
-		timeout_new=OSTimeGet();
-		if (timeout_new>timeout) timeout_new = timeout_new - timeout;//算出请求消息或使用的时间
-		else timeout_new = 0xffffffff - timeout + timeout_new; 
-		timeout=timeout_new*1000/OS_TICKS_PER_SEC + 1; 
+		msg = &dummyptr;
 	}
-	return timeout; 
+		
+	if ( timeout != 0 )
+	{
+		if ( pdTRUE == xQueueReceive(*mbox, &(*msg), timeout / portTICK_RATE_MS ) )
+		{
+			EndTime = xTaskGetTickCount();
+			Elapsed = (EndTime - StartTime) * portTICK_RATE_MS;
+			
+			return ( Elapsed );
+		}
+		else // timed out blocking for message
+		{
+			*msg = NULL;
+			
+			return SYS_ARCH_TIMEOUT;
+		}
+	}
+	else // block forever for a message.
+	{
+		while( pdTRUE != xQueueReceive(*mbox, &(*msg), portMAX_DELAY ) ){} // time is arbitrary
+		EndTime = xTaskGetTickCount();
+		Elapsed = (EndTime - StartTime) * portTICK_RATE_MS;
+		
+		return ( Elapsed ); // return time blocked TODO test	
+	}
 }
 //尝试获取消息
 //*mbox:消息邮箱
@@ -147,7 +190,23 @@ u32_t sys_arch_mbox_fetch(sys_mbox_t *mbox, void **msg, u32_t timeout)
 //返回值:等待消息所用的时间/SYS_ARCH_TIMEOUT
 u32_t sys_arch_mbox_tryfetch(sys_mbox_t *mbox, void **msg)
 {
-	return sys_arch_mbox_fetch(mbox,msg,1);//尝试获取一个消息
+//	return sys_arch_mbox_fetch(mbox,msg,1);//尝试获取一个消息
+	
+	void *dummyptr;
+
+	if ( msg == NULL )
+	{
+		msg = &dummyptr;
+	}
+
+	if ( pdTRUE == xQueueReceive(*mbox, &(*msg), 0 ) )
+	{
+	  return ERR_OK;
+	}
+	else
+	{
+	  return SYS_MBOX_EMPTY;
+	}
 }
 //检查一个消息邮箱是否有效
 //*mbox:消息邮箱
@@ -158,10 +217,9 @@ int sys_mbox_valid(sys_mbox_t *mbox)
 	sys_mbox_t m_box=*mbox;
 	u8_t ucErr;
 	int ret;
-	OS_Q_DATA q_data;
-	memset(&q_data,0,sizeof(OS_Q_DATA));
-	ucErr=OSQQuery (m_box->pQ,&q_data);
-	ret=(ucErr<2&&(q_data.OSNMsgs<q_data.OSQSize))?1:0;
+	
+	ucErr=uxQueueSpacesAvailable(m_box);
+	ret=(ucErr < 2) ? 1:0;
 	return ret; 
 } 
 //设置一个消息邮箱为无效
@@ -177,12 +235,33 @@ void sys_mbox_set_invalid(sys_mbox_t *mbox)
 // 	     ERR_MEM,创建失败
 err_t sys_sem_new(sys_sem_t * sem, u8_t count)
 {  
-	u8_t err; 
-	*sem=OSSemCreate((u16_t)count);
-	if(*sem==NULL)return ERR_MEM; 
-	OSEventNameSet(*sem,"LWIP Sem",&err);
-	LWIP_ASSERT("OSSemCreate ",*sem != NULL );
-	return ERR_OK;
+	xSemaphoreHandle  xSemaphore;
+
+	vSemaphoreCreateBinary( xSemaphore );
+	
+	if( xSemaphore == NULL )
+	{
+		
+#if SYS_STATS
+      ++lwip_stats.sys.sem.err;
+#endif /* SYS_STATS */
+			
+		return SYS_SEM_NULL;	// TODO need assert
+	}
+	
+	if(count == 0)	// Means it can't be taken
+	{
+		xSemaphoreTake(xSemaphore,1);
+	}
+
+#if SYS_STATS
+	++lwip_stats.sys.sem.used;
+ 	if (lwip_stats.sys.sem.max < lwip_stats.sys.sem.used) {
+		lwip_stats.sys.sem.max = lwip_stats.sys.sem.used;
+	}
+#endif /* SYS_STATS */
+		
+	return xSemaphore;
 } 
 //等待一个信号量
 //*sem:要等待的信号量
@@ -244,7 +323,18 @@ void sys_sem_set_invalid(sys_sem_t *sem)
 //arch初始化
 void sys_init(void)
 { 
-    //这里,我们在该函数,不做任何事情
+	int i;
+
+	// Initialize the the per-thread sys_timeouts structures
+	// make sure there are no valid pids in the list
+	for(i = 0; i < SYS_THREAD_MAX; i++)
+	{
+		s_timeoutlist[i].pid = 0;
+		s_timeoutlist[i].timeouts.next = NULL;
+	}
+
+	// keep track of how many threads have been created
+	s_nextthread = 0;事情
 } 
 extern OS_STK * TCPIP_THREAD_TASK_STK;//TCP IP内核任务堆栈,在lwip_comm函数定义
 //创建一个新进程

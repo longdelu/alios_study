@@ -16,6 +16,8 @@
 #include <stdarg.h>
 
 #include "FreeRTOS.h"
+#include "task.h"
+#include "semphr.h"
 
 #include <stm32f4xx.h>	    
 

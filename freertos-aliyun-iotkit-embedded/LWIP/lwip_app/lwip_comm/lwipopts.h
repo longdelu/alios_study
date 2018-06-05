@@ -1,6 +1,8 @@
 #ifndef __LWIPOPTS_H__
 #define __LWIPOPTS_H__
 
+#include "includes.h"  //使用UCOS 要添加此头文件！
+
 //线程优先级
 #ifndef TCPIP_THREAD_PRIO
 #define TCPIP_THREAD_PRIO		5	//定义内核任务的优先级为5
@@ -96,7 +98,9 @@
 //有关系统的选项
 #define TCPIP_THREAD_STACKSIZE          1000	//内核任务堆栈大小
 #define DEFAULT_UDP_RECVMBOX_SIZE       2000
-#define DEFAULT_THREAD_STACKSIZE        512
+#define DEFAULT_THREAD_STACKSIZE        configMINIMAL_STACK_SIZE
+#define SYS_DEFAULT_THREAD_STACK_DEPTH	 configMINIMAL_STACK_SIZE
+
 
 //LWIP调试选项
 #define LWIP_DEBUG                    	 0	 //关闭DEBUG选项

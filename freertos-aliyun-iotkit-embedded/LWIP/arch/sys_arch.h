@@ -31,8 +31,7 @@
  */
 #ifndef __ARCH_SYS_ARCH_H__
 #define __ARCH_SYS_ARCH_H__ 
-#include <includes.h>
-#include "arch/cc.h"
+
 #include "includes.h"
  
 #ifdef SYS_ARCH_GLOBALS
@@ -43,17 +42,19 @@
  
 #define MAX_QUEUES        		10	// 消息邮箱的数量
 #define MAX_QUEUE_ENTRIES 		20	// 每个消息邮箱的大小
-//LWIP消息邮箱结构体
-typedef struct {
-    OS_EVENT*   pQ;    //UCOS中指向事件控制块的指针
-    void*       pvQEntries[MAX_QUEUE_ENTRIES];//消息队列 MAX_QUEUE_ENTRIES消息队列中最多消息数
-} TQ_DESCR, *PQ_DESCR;
+
+/* Message queue constants. */
+#define archMESG_QUEUE_LENGTH	( 6 )
+
+#define SYS_MBOX_NULL (xQueueHandle)0
+#define SYS_SEM_NULL  (xSemaphoreHandle)0
 
 
-typedef OS_EVENT *sys_sem_t;    //LWIP使用的信号量
-typedef OS_EVENT *sys_mutex_t; 	//LWIP使用的互斥信号量
-typedef PQ_DESCR sys_mbox_t;    //LWIP使用的消息邮箱,其实就是UCOS中的消息队列
-typedef INT8U sys_thread_t;     //线程ID,也就是任务优先级
+
+typedef xSemaphoreHandle sys_sem_t;     //LWIP使用的信号量
+typedef xSemaphoreHandle sys_mutex_t; 	//LWIP使用的互斥信号量
+typedef xQueueHandle sys_mbox_t;        //消息队列
+typedef xTaskHandle sys_thread_t;       //线程ID,也就是任务句柄
 #endif 
 
 /* __SYS_RTXC_H__ */
