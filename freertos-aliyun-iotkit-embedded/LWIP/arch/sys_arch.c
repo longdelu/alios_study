@@ -68,9 +68,11 @@ static u16_t s_nextthread = 0;
 err_t sys_mbox_new(sys_mbox_t mbox, int size)
 {
 	
-	( void ) size;
+	(void)size;
 	
-	mbox = xQueueCreate(archMESG_QUEUE_LENGTH, sizeof( void * ) );
+	mbox = xQueueCreate(MAX_QUEUES, MAX_QUEUE_ENTRIES);
+    
+    (void)mbox;
 
 #if SYS_STATS
       ++lwip_stats.sys.mbox.used;
@@ -215,18 +217,22 @@ u32_t sys_arch_mbox_tryfetch(sys_mbox_t mbox, void **msg)
 int sys_mbox_valid(sys_mbox_t mbox)
 {  
 	sys_mbox_t m_box=mbox;
-	u8_t ucErr;
+	int ucErr;
 	int ret;
 	
 	ucErr=uxQueueSpacesAvailable(m_box);
-	ret=(ucErr < 2) ? 1:0;
+    
+	ret=(ucErr <= 2) ? 1:0;
+    
 	return ret; 
 } 
+
 //设置一个消息邮箱为无效
 //*mbox:消息邮箱
 void sys_mbox_set_invalid(sys_mbox_t mbox)
 {
 	mbox=NULL;
+    (void)mbox;
 } 
 //创建一个信号量
 //*sem:创建的信号量
@@ -235,11 +241,10 @@ void sys_mbox_set_invalid(sys_mbox_t mbox)
 // 	     ERR_MEM,创建失败
 err_t sys_sem_new(sys_sem_t sem, u8_t count)
 {  
-	xSemaphoreHandle  xSemaphore;
 
-	vSemaphoreCreateBinary( xSemaphore );
-	
-	if( xSemaphore == NULL )
+	vSemaphoreCreateBinary( sem );
+    
+	if( sem == NULL )
 	{
 		
 #if SYS_STATS
@@ -251,7 +256,7 @@ err_t sys_sem_new(sys_sem_t sem, u8_t count)
 	
 	if(count == 0)	// Means it can't be taken
 	{
-		xSemaphoreTake(xSemaphore,1);
+		xSemaphoreTake(sem, 1);
 	}
 
 #if SYS_STATS
@@ -321,16 +326,17 @@ void sys_sem_free(sys_sem_t sem)
 //      0,无效
 int sys_sem_valid(sys_sem_t sem)
 {
-	return 1;              
+    return uxSemaphoreGetCount(sem);
+             
 } 
 //设置一个信号量无效
 //sem:信号量指针
 void sys_sem_set_invalid(sys_sem_t sem)
 {
 	sem=NULL;
-    
-    
+      
 } 
+
 //arch初始化
 void sys_init(void)
 { 

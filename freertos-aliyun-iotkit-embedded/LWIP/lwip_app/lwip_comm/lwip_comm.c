@@ -189,14 +189,13 @@ void lwip_comm_dhcp_creat(void)
     SYS_ARCH_PROTECT(lev);   //进入临界区
     
     //创建DHCP任务
-    Dhcp_xHandle = xTaskCreateStatic(
-                      lwip_dhcp_task,           // Function that implements the task.
-                      "NAME",                   // Text name for the task.
-                      LWIP_DHCP_STK_SIZE - 4,   // Stack size in words, not bytes.
-                      (void*)0,                 // Parameter passed into the task.
-                      LWIP_DHCP_TASK_PRIO,      // Priority at which the task is created.
-                      LWIP_DHCP_TASK_STK,       // Array to use as the task's stack.
-                      &xTcpipTaskBuffer );      // Variable to hold the task's data structure.
+    xTaskCreate(
+                lwip_dhcp_task,           // Function that implements the task.
+                "NAME",                   // Text name for the task.
+                LWIP_DHCP_STK_SIZE,       // Stack size in words, not bytes.
+                (void*)0,                 // Parameter passed into the task.
+                LWIP_DHCP_TASK_PRIO,      // Priority at which the task is created.           
+                &Dhcp_xHandle);           // Variable to hold the task's data structure.
                       
 	SYS_ARCH_UNPROTECT(lev);  //退出临界区
 }

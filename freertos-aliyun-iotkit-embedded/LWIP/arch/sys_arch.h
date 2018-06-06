@@ -39,12 +39,10 @@
 #else
 #define SYS_ARCH_EXT extern
 #endif
- 
-#define MAX_QUEUES        		10	// 消息邮箱的数量
-#define MAX_QUEUE_ENTRIES 		20	// 每个消息邮箱的大小
 
-/* Message queue constants. */
-#define archMESG_QUEUE_LENGTH	( 6 )
+/* Message queue constants. */ 
+#define MAX_QUEUES        		10	// 消息队列的数量
+#define MAX_QUEUE_ENTRIES 		20	// 每个消息队列的大小
 
 #define SYS_MBOX_NULL (xQueueHandle)0
 #define SYS_SEM_NULL  (xSemaphoreHandle)0

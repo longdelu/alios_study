@@ -101,9 +101,9 @@ typedef struct QueueDefinition
 	List_t xTasksWaitingToSend;		/*< List of tasks that are blocked waiting to post onto this queue.  Stored in priority order. */
 	List_t xTasksWaitingToReceive;	/*< List of tasks that are blocked waiting to read from this queue.  Stored in priority order. */
 
-	volatile UBaseType_t uxMessagesWaiting;/*< The number of items currently in the queue. */
-	UBaseType_t uxLength;			/*< The length of the queue defined as the number of items it will hold, not the number of bytes. */
-	UBaseType_t uxItemSize;			/*< The size of each items that the queue will hold. */
+	volatile UBaseType_t uxMessagesWaiting;/*< The number of items currently in the queue.（队列的使用数量) */
+	UBaseType_t uxLength;			/*< The length of the queue defined as the number of items it will hold, not the number of bytes. （队列总数量)*/
+	UBaseType_t uxItemSize;			/*< The size of each items that the queue will hold.(每个队列的长度） */
 
 	volatile int8_t cRxLock;		/*< Stores the number of items received from the queue (removed from the queue) while the queue was locked.  Set to queueUNLOCKED when the queue is not locked. */
 	volatile int8_t cTxLock;		/*< Stores the number of items transmitted to the queue (added to the queue) while the queue was locked.  Set to queueUNLOCKED when the queue is not locked. */
