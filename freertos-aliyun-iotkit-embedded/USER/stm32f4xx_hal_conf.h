@@ -178,8 +178,9 @@
 
 /* Section 2: PHY configuration section */
 
-/* DP83848 PHY Address*/ 
+/* PHY Address*/ 
 #define LAN8720_PHY_ADDRESS             0x00
+
 /* PHY Reset delay these values are based on a 1 ms Systick interrupt*/ 
 #define PHY_RESET_DELAY                 ((uint32_t)0x00000FF)
 /* PHY Configuration delay */

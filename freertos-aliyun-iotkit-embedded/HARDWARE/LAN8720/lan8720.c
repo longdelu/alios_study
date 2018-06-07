@@ -146,16 +146,13 @@ extern void lwip_pkt_handle(void);		//在lwip_comm.c里面定义
 void ETH_IRQHandler(void)
 {
     INTX_DISABLE(); 
-    
     while(ETH_GetRxPktSize(ETH_Handler.RxDesc))   
     {
         lwip_pkt_handle();//处理以太网数据，即将数据提交给LWIP
     }
-    
     //清除中断标志位
     __HAL_ETH_DMA_CLEAR_IT(&ETH_Handler,ETH_DMA_IT_R); 
     __HAL_ETH_DMA_CLEAR_IT(&ETH_Handler,ETH_DMA_IT_NIS); 
-    
     INTX_ENABLE();  
 }
 
@@ -171,7 +168,6 @@ u32  ETH_GetRxPktSize(ETH_DMADescTypeDef *DMARxDesc)
     {
         frameLength=((DMARxDesc->Status&ETH_DMARXDESC_FL)>>ETH_DMARXDESC_FRAME_LENGTHSHIFT);
     }
-    
     return frameLength;
 }
 

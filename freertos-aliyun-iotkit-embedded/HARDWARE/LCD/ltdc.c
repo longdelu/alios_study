@@ -362,7 +362,6 @@ void LTDC_Init(void)
 	lcdid=LTDC_PanelID_Read();			//读取LCD面板ID	
 	if(lcdid==0X4342)
 	{
-        printf("id=%x\r\n",lcdid);
 		lcdltdc.pwidth=480;			//面板宽度,单位:像素
 		lcdltdc.pheight=272;		//面板高度,单位:像素
 		lcdltdc.hsw=1;				//水平同步宽度

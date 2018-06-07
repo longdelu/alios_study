@@ -120,8 +120,8 @@
 /** @defgroup ETH_Private_Constants ETH Private Constants
   * @{
   */
-#define LINKED_STATE_TIMEOUT_VALUE          ((uint32_t)2000)  /* 2000 ms */
-#define AUTONEGO_COMPLETED_TIMEOUT_VALUE    ((uint32_t)1000)  /* 1000 ms */
+#define LINKED_STATE_TIMEOUT_VALUE          ((uint32_t)10000)  /* 10000 ms */
+#define AUTONEGO_COMPLETED_TIMEOUT_VALUE    ((uint32_t)10000)  /* 10000 ms */
 
 /**
   * @}
@@ -179,7 +179,7 @@ HAL_StatusTypeDef HAL_ETH_Init(ETH_HandleTypeDef *heth)
 {
   uint32_t tmpreg1 = 0, phyreg = 0;
   uint32_t hclk = 60000000;
-  uint32_t tickstart = 0;
+  __IO uint32_t tickstart = 0;
   uint32_t err = ETH_SUCCESS;
   
   /* Check the ETH peripheral state */
@@ -259,24 +259,7 @@ HAL_StatusTypeDef HAL_ETH_Init(ETH_HandleTypeDef *heth)
   (heth->Instance)->MACMIIAR = (uint32_t)tmpreg1;
   
   /*-------------------- PHY initialization and configuration ----------------*/
-  /* Put the PHY in reset mode */
-  if((HAL_ETH_WritePHYRegister(heth, PHY_BCR, PHY_RESET)) != HAL_OK)
-  {
-    /* In case of write timeout */
-    err = ETH_ERROR;
-    
-    /* Config MAC and DMA */
-    ETH_MACDMAConfig(heth, err);
-    
-    /* Set the ETH peripheral state to READY */
-    heth->State = HAL_ETH_STATE_READY;
-    
-    /* Return HAL_ERROR */
-    return HAL_ERROR;
-  }
-  
-  /* Delay to assure PHY reset */
-  HAL_Delay(PHY_RESET_DELAY);
+ 
   
   if((heth->Init).AutoNegotiation != ETH_AUTONEGOTIATION_DISABLE)
   {
@@ -1043,7 +1026,7 @@ __weak void HAL_ETH_ErrorCallback(ETH_HandleTypeDef *heth)
 HAL_StatusTypeDef HAL_ETH_ReadPHYRegister(ETH_HandleTypeDef *heth, uint16_t PHYReg, uint32_t *RegValue)
 {
   uint32_t tmpreg1 = 0;     
-  uint32_t tickstart = 0;
+  __IO uint32_t tickstart = 0;
   
   /* Check parameters */
   assert_param(IS_ETH_PHY_ADDRESS(heth->Init.PhyAddress));

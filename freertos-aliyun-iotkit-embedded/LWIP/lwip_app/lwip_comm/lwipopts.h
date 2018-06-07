@@ -8,11 +8,11 @@
 #define TCPIP_THREAD_PRIO		5	//定义内核任务的优先级为5
 #endif
 #undef  DEFAULT_THREAD_PRIO
-#define DEFAULT_THREAD_PRIO		2
+#define DEFAULT_THREAD_PRIO		7
 
 
 #define SYS_LIGHTWEIGHT_PROT    1		//为1时使用实时操作系统的轻量级保护,保护关键代码不被中断打断
-#define NO_SYS                  0  		//使用UCOS操作系统
+#define NO_SYS                  0  		//使用操作系统
 #define MEM_ALIGNMENT           4  		//使用4字节对齐模式
 #define MEM_SIZE                16000 	//内存堆heap大小
 #define MEMP_NUM_PBUF           20 		//MEMP_NUM_PBUF:memp结构的pbuf数量,如果应用从ROM或者静态存储区发送大量数据时,这个值应该设置大一点
@@ -89,9 +89,17 @@
 #endif
 
 
+#if (NO_SYS==1)
+#define LWIP_NETCONN                    0 	//LWIP_NETCONN==1:使能NETCON函数(要求使用api_lib.c)
+#define LWIP_SOCKET                     0	//LWIP_SOCKET==1:使能Sicket API(要求使用sockets.c)
+
+#else 
 
 #define LWIP_NETCONN                    1 	//LWIP_NETCONN==1:使能NETCON函数(要求使用api_lib.c)
 #define LWIP_SOCKET                     1	//LWIP_SOCKET==1:使能Sicket API(要求使用sockets.c)
+
+#endif
+
 #define LWIP_COMPAT_MUTEX               1
 #define LWIP_SO_RCVTIMEO                1 	//通过定义LWIP_SO_RCVTIMEO使能netconn结构体中recv_timeout,使用recv_timeout可以避免阻塞线程
 
