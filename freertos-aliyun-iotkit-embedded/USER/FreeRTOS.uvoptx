@@ -508,7 +508,7 @@
 
   <Group>
     <GroupName>HALLIB</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -756,7 +756,7 @@
 
   <Group>
     <GroupName>SYSTEM</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -916,7 +916,7 @@
 
   <Group>
     <GroupName>FreeRTOS_CORE</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1028,7 +1028,7 @@
 
   <Group>
     <GroupName>MALLOC</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1068,7 +1068,7 @@
 
   <Group>
     <GroupName>AliYun</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2064,7 +2064,7 @@
 
   <Group>
     <GroupName>LWIP_NETIF</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2084,7 +2084,7 @@
       <GroupNumber>13</GroupNumber>
       <FileNumber>134</FileNumber>
       <FileType>1</FileType>
-      <tvExp>0</tvExp>
+      <tvExp>1</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
       <PathWithFileName>..\LWIP\lwip-1.4.1\src\netif\ethernetif.c</PathWithFileName>
@@ -2116,7 +2116,7 @@
 
   <Group>
     <GroupName>LWIP_API</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2148,7 +2148,7 @@
       <GroupNumber>15</GroupNumber>
       <FileNumber>138</FileNumber>
       <FileType>1</FileType>
-      <tvExp>0</tvExp>
+      <tvExp>1</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
       <PathWithFileName>..\LWIP\lwip-1.4.1\src\api\err.c</PathWithFileName>

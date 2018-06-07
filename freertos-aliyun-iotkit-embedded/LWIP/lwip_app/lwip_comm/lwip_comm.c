@@ -39,6 +39,38 @@ extern u32 memp_get_memorysize(void);	//在memp.c里面定义
 extern u8_t *memp_memory;				//在memp.c里面定义.
 extern u8_t *ram_heap;					//在mem.c里面定义.
 
+#if NO_SYS
+/////////////////////////////////////////////////////////////////////////////////
+//lwip两个任务定义(内核任务和DHCP任务)
+
+//lwip内核任务堆栈(优先级和堆栈大小在lwipopts.h定义了) 
+StackType_t *TCPIP_THREAD_TASK_STK;	 
+
+TaskHandle_t Tcpip_xHandle = NULL;
+StaticTask_t xTcpipTaskBuffer;
+
+TaskHandle_t Dhcp_xHandle = NULL;
+StaticTask_t xDhcpTaskBuffer;
+
+//lwip DHCP任务
+//设置任务优先级
+#define LWIP_DHCP_TASK_PRIO       		7
+
+//设置任务堆栈大小
+#define LWIP_DHCP_STK_SIZE  		    128
+//任务堆栈，采用内存管理的方式控制申请	
+StackType_t *LWIP_DHCP_TASK_STK;	
+//任务函数
+void lwip_dhcp_task(void *pdata); 
+
+//用于以太网中断调用
+void lwip_pkt_handle(void)
+{
+	ethernetif_input(&lwip_netif);
+}
+
+#else
+
 u32 TCPTimer=0;			//TCP查询计时器
 u32 ARPTimer=0;			//ARP查询计时器
 u32 lwip_localtime;		//lwip本地时间计数器,单位:ms
@@ -46,6 +78,8 @@ u32 lwip_localtime;		//lwip本地时间计数器,单位:ms
 #if LWIP_DHCP
 u32 DHCPfineTimer=0;	//DHCP精细处理计时器
 u32 DHCPcoarseTimer=0;	//DHCP粗糙处理计时器
+#endif
+
 #endif
 
 //lwip中mem和memp的内存申请
@@ -59,11 +93,24 @@ u8 lwip_comm_mem_malloc(void)
 	memp_memory=mymalloc(SRAMIN,mempsize);	//为memp_memory申请内存
 	ramheapsize=LWIP_MEM_ALIGN_SIZE(MEM_SIZE)+2*LWIP_MEM_ALIGN_SIZE(4*3)+MEM_ALIGNMENT;//得到ram heap大小
 	ram_heap=mymalloc(SRAMIN,ramheapsize);	//为ram_heap申请内存 
+
+
+    
 	if(!(u32)&memp_memory||!(u32)&ram_heap)//有申请失败的
+       
+
+    
+//    TCPIP_THREAD_TASK_STK=mymalloc(SRAMIN,TCPIP_THREAD_STACKSIZE*4);//给内核任务申请堆栈 
+//	LWIP_DHCP_TASK_STK=mymalloc(SRAMIN,LWIP_DHCP_STK_SIZE*4);		//给dhcp任务堆栈申请内存空间
+//    
+//	if(!memp_memory||!ram_heap||!TCPIP_THREAD_TASK_STK||!LWIP_DHCP_TASK_STK)//有申请失败的
+        
+
 	{
 		lwip_comm_mem_free();
 		return 1;
 	}
+    
 	return 0;	
 }
 //lwip中mem和memp内存释放
@@ -71,6 +118,12 @@ void lwip_comm_mem_free(void)
 { 	
 	myfree(SRAMIN,memp_memory);
 	myfree(SRAMIN,ram_heap);
+#if NO_SYS==0
+
+    myfree(SRAMIN,TCPIP_THREAD_TASK_STK);
+	myfree(SRAMIN,LWIP_DHCP_TASK_STK);
+
+#endif
 }
 //lwip 默认IP设置
 //lwipx:lwip控制结构体指针
@@ -129,7 +182,13 @@ u8 lwip_comm_init(void)
         retry++;
         if(retry>5) {retry=0;return 3;} //LAN8720初始化失败
     }
-	lwip_init();						//初始化LWIP内核
+
+#if NO_SYS==1
+    lwip_init();						//初始化LWIP内核
+#else
+
+ 	tcpip_init(NULL,NULL);				//初始化tcp ip内核,该函数里面会创建tcpip_thread内核任务
+#endif
 
 #if LWIP_DHCP		//使用动态IP
 	ipaddr.addr = 0;
@@ -144,13 +203,19 @@ u8 lwip_comm_init(void)
 	printf("子网掩码..........................%d.%d.%d.%d\r\n",lwipdev.netmask[0],lwipdev.netmask[1],lwipdev.netmask[2],lwipdev.netmask[3]);
 	printf("默认网关..........................%d.%d.%d.%d\r\n",lwipdev.gateway[0],lwipdev.gateway[1],lwipdev.gateway[2],lwipdev.gateway[3]);
 #endif
+
+#if NO_SYS==1
 	Netif_Init_Flag=netif_add(&lwip_netif,&ipaddr,&netmask,&gw,NULL,&ethernetif_init,&ethernet_input);//向网卡列表中添加一个网口
 	
 #if LWIP_DHCP			//如果使用DHCP的话
 	lwipdev.dhcpstatus=0;	//DHCP标记为0
 	dhcp_start(&lwip_netif);	//开启DHCP服务
 #endif
-	
+
+#else 
+
+   Netif_Init_Flag=netif_add(&lwip_netif,&ipaddr,&netmask,&gw,NULL,&ethernetif_init,&tcpip_input);//向网卡列表中添加一个网口
+#endif  
 	if(Netif_Init_Flag==NULL)return 4;//网卡添加失败 
 	else//网口添加成功后,设置netif为默认值,并且打开netif网口
 	{
@@ -160,6 +225,8 @@ u8 lwip_comm_init(void)
 	return 0;//操作OK.
 }   
 
+
+#if  NO_SYS==1
 //当接收到数据后调用 
 void lwip_pkt_handle(void)
 {
@@ -255,10 +322,92 @@ void lwip_dhcp_process_handle(void)
 }
 #endif 
 
+#else
 
 
+#if LWIP_DHCP
+//创建DHCP任务
+void lwip_comm_dhcp_creat(void)
+{
+    
+	SYS_ARCH_DECL_PROTECT(lev);
+    
+    SYS_ARCH_PROTECT(lev);   //进入临界区
+    
+    //创建DHCP任务
+    xTaskCreate(
+                lwip_dhcp_task,           // Function that implements the task.
+                "NAME",                   // Text name for the task.
+                LWIP_DHCP_STK_SIZE,       // Stack size in words, not bytes.
+                (void*)0,                 // Parameter passed into the task.
+                LWIP_DHCP_TASK_PRIO,      // Priority at which the task is created.           
+                &Dhcp_xHandle);           // Variable to hold the task's data structure.
+                      
+	SYS_ARCH_UNPROTECT(lev);  //退出临界区
+}
+//删除DHCP任务
+void lwip_comm_dhcp_delete(void)
+{
+	dhcp_stop(&lwip_netif); 		//关闭DHCP
+	vTaskDelete(Dhcp_xHandle);	    //删除DHCP任务
+}
+//DHCP处理任务
+void lwip_dhcp_task(void *pdata)
+{
+	u32 ip=0,netmask=0,gw=0;
+	dhcp_start(&lwip_netif);//开启DHCP 
+	lwipdev.dhcpstatus=0;	//正在DHCP
+	printf("正在查找DHCP服务器,请稍等...........\r\n");   
+	while(1)
+	{ 
+		printf("正在获取地址...\r\n");
+		ip=lwip_netif.ip_addr.addr;		//读取新IP地址
+		netmask=lwip_netif.netmask.addr;//读取子网掩码
+		gw=lwip_netif.gw.addr;			//读取默认网关 
+		if(ip!=0)   					//当正确读取到IP地址的时候
+		{
+			lwipdev.dhcpstatus=2;	//DHCP成功
+ 			printf("网卡en的MAC地址为:................%d.%d.%d.%d.%d.%d\r\n",lwipdev.mac[0],lwipdev.mac[1],lwipdev.mac[2],lwipdev.mac[3],lwipdev.mac[4],lwipdev.mac[5]);
+			//解析出通过DHCP获取到的IP地址
+			lwipdev.ip[3]=(uint8_t)(ip>>24); 
+			lwipdev.ip[2]=(uint8_t)(ip>>16);
+			lwipdev.ip[1]=(uint8_t)(ip>>8);
+			lwipdev.ip[0]=(uint8_t)(ip);
+			printf("通过DHCP获取到IP地址..............%d.%d.%d.%d\r\n",lwipdev.ip[0],lwipdev.ip[1],lwipdev.ip[2],lwipdev.ip[3]);
+			//解析通过DHCP获取到的子网掩码地址
+			lwipdev.netmask[3]=(uint8_t)(netmask>>24);
+			lwipdev.netmask[2]=(uint8_t)(netmask>>16);
+			lwipdev.netmask[1]=(uint8_t)(netmask>>8);
+			lwipdev.netmask[0]=(uint8_t)(netmask);
+			printf("通过DHCP获取到子网掩码............%d.%d.%d.%d\r\n",lwipdev.netmask[0],lwipdev.netmask[1],lwipdev.netmask[2],lwipdev.netmask[3]);
+			//解析出通过DHCP获取到的默认网关
+			lwipdev.gateway[3]=(uint8_t)(gw>>24);
+			lwipdev.gateway[2]=(uint8_t)(gw>>16);
+			lwipdev.gateway[1]=(uint8_t)(gw>>8);
+			lwipdev.gateway[0]=(uint8_t)(gw);
+			printf("通过DHCP获取到的默认网关..........%d.%d.%d.%d\r\n",lwipdev.gateway[0],lwipdev.gateway[1],lwipdev.gateway[2],lwipdev.gateway[3]);
+			break;
+		}else if(lwip_netif.dhcp->tries>LWIP_MAX_DHCP_TRIES) //通过DHCP服务获取IP地址失败,且超过最大尝试次数
+		{  
+			lwipdev.dhcpstatus=0XFF;//DHCP失败.
+			//使用静态IP地址
+			IP4_ADDR(&(lwip_netif.ip_addr),lwipdev.ip[0],lwipdev.ip[1],lwipdev.ip[2],lwipdev.ip[3]);
+			IP4_ADDR(&(lwip_netif.netmask),lwipdev.netmask[0],lwipdev.netmask[1],lwipdev.netmask[2],lwipdev.netmask[3]);
+			IP4_ADDR(&(lwip_netif.gw),lwipdev.gateway[0],lwipdev.gateway[1],lwipdev.gateway[2],lwipdev.gateway[3]);
+			printf("DHCP服务超时,使用静态IP地址!\r\n");
+			printf("网卡en的MAC地址为:................%d.%d.%d.%d.%d.%d\r\n",lwipdev.mac[0],lwipdev.mac[1],lwipdev.mac[2],lwipdev.mac[3],lwipdev.mac[4],lwipdev.mac[5]);
+			printf("静态IP地址........................%d.%d.%d.%d\r\n",lwipdev.ip[0],lwipdev.ip[1],lwipdev.ip[2],lwipdev.ip[3]);
+			printf("子网掩码..........................%d.%d.%d.%d\r\n",lwipdev.netmask[0],lwipdev.netmask[1],lwipdev.netmask[2],lwipdev.netmask[3]);
+			printf("默认网关..........................%d.%d.%d.%d\r\n",lwipdev.gateway[0],lwipdev.gateway[1],lwipdev.gateway[2],lwipdev.gateway[3]);
+			break;
+		}  
+		delay_ms(250); //延时250ms
+	}
+	lwip_comm_dhcp_delete();//删除DHCP任务 
+}
+#endif 
 
-
+#endif
 
 
 

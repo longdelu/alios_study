@@ -1,7 +1,9 @@
 #ifndef _LWIP_COMM_H
 #define _LWIP_COMM_H 
+
 #include "lan8720.h" 
 #include "sys.h"
+
 //////////////////////////////////////////////////////////////////////////////////	 
 //本程序只供学习使用，未经作者许可，不得用于其它任何用途
 //ALIENTEK STM32F429开发板
@@ -38,15 +40,29 @@ typedef struct
 extern __lwip_dev lwipdev;	//lwip控制结构体
 
 void lwip_pkt_handle(void);
-void lwip_periodic_handle(void);
-	
+
+
 void lwip_comm_default_ip_set(__lwip_dev *lwipx);
 u8 lwip_comm_mem_malloc(void);
 void lwip_comm_mem_free(void);
 u8 lwip_comm_init(void);
+
+
+#if NO_SYS
+
+void lwip_comm_dhcp_creat(void);
+void lwip_comm_dhcp_delete(void);
+void lwip_comm_destroy(void);
+void lwip_comm_delete_next_timeout(void);
+
+#else 
+
 void lwip_dhcp_process_handle(void);
+void lwip_periodic_handle(void);
 
 #endif
+
+#endif /* end of file */
 
 
 
