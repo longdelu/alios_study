@@ -43,7 +43,7 @@
 #include "arch/sys_arch.h"
 #include "malloc.h"
 
-#if (NO_SYS==0)
+#if !NO_SYS
 xTaskHandle xTaskGetCurrentTaskHandle( void ) PRIVILEGED_FUNCTION;
 
 struct timeoutlist

@@ -48,7 +48,7 @@ void lwip_comm_mem_free(void);
 u8 lwip_comm_init(void);
 
 
-#if NO_SYS
+#if !NO_SYS
 
 void lwip_comm_dhcp_creat(void);
 void lwip_comm_dhcp_delete(void);

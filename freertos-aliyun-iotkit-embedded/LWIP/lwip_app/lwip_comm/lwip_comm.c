@@ -1,4 +1,4 @@
-#include "lwip_comm.h" 
+
 #include "netif/etharp.h"
 #include "lwip/dhcp.h"
 #include "lwip/mem.h"
@@ -16,6 +16,7 @@
 #include "pcf8574.h"
 #include <stdio.h>
 #include "includes.h"
+#include "lwip_comm.h" 
 //////////////////////////////////////////////////////////////////////////////////	 
 //本程序只供学习使用，未经作者许可，不得用于其它任何用途
 //ALIENTEK STM32F429开发板
@@ -40,6 +41,18 @@ extern u8_t *memp_memory;				//在memp.c里面定义.
 extern u8_t *ram_heap;					//在mem.c里面定义.
 
 #if NO_SYS
+
+u32 TCPTimer=0;			//TCP查询计时器
+u32 ARPTimer=0;			//ARP查询计时器
+u32 lwip_localtime;		//lwip本地时间计数器,单位:ms
+
+#if LWIP_DHCP
+u32 DHCPfineTimer=0;	//DHCP精细处理计时器
+u32 DHCPcoarseTimer=0;	//DHCP粗糙处理计时器
+#endif
+
+#else
+
 /////////////////////////////////////////////////////////////////////////////////
 //lwip两个任务定义(内核任务和DHCP任务)
 
@@ -69,17 +82,6 @@ void lwip_pkt_handle(void)
 	ethernetif_input(&lwip_netif);
 }
 
-#else
-
-u32 TCPTimer=0;			//TCP查询计时器
-u32 ARPTimer=0;			//ARP查询计时器
-u32 lwip_localtime;		//lwip本地时间计数器,单位:ms
-
-#if LWIP_DHCP
-u32 DHCPfineTimer=0;	//DHCP精细处理计时器
-u32 DHCPcoarseTimer=0;	//DHCP粗糙处理计时器
-#endif
-
 #endif
 
 //lwip中mem和memp的内存申请
@@ -95,16 +97,16 @@ u8 lwip_comm_mem_malloc(void)
 	ram_heap=mymalloc(SRAMIN,ramheapsize);	//为ram_heap申请内存 
 
 
-    
+#if NO_SYS    
 	if(!(u32)&memp_memory||!(u32)&ram_heap)//有申请失败的
        
-
+#else 
     
-//    TCPIP_THREAD_TASK_STK=mymalloc(SRAMIN,TCPIP_THREAD_STACKSIZE*4);//给内核任务申请堆栈 
-//	LWIP_DHCP_TASK_STK=mymalloc(SRAMIN,LWIP_DHCP_STK_SIZE*4);		//给dhcp任务堆栈申请内存空间
-//    
-//	if(!memp_memory||!ram_heap||!TCPIP_THREAD_TASK_STK||!LWIP_DHCP_TASK_STK)//有申请失败的
-        
+    TCPIP_THREAD_TASK_STK=mymalloc(SRAMIN,TCPIP_THREAD_STACKSIZE*4);//给内核任务申请堆栈 
+	LWIP_DHCP_TASK_STK=mymalloc(SRAMIN,LWIP_DHCP_STK_SIZE*4);		//给dhcp任务堆栈申请内存空间
+   
+	if(!memp_memory||!ram_heap||!TCPIP_THREAD_TASK_STK||!LWIP_DHCP_TASK_STK)//有申请失败的
+#endif        
 
 	{
 		lwip_comm_mem_free();
@@ -118,7 +120,7 @@ void lwip_comm_mem_free(void)
 { 	
 	myfree(SRAMIN,memp_memory);
 	myfree(SRAMIN,ram_heap);
-#if NO_SYS==0
+#if !NO_SYS
 
     myfree(SRAMIN,TCPIP_THREAD_TASK_STK);
 	myfree(SRAMIN,LWIP_DHCP_TASK_STK);
@@ -183,7 +185,7 @@ u8 lwip_comm_init(void)
         if(retry>5) {retry=0;return 3;} //LAN8720初始化失败
     }
 
-#if NO_SYS==1
+#if NO_SYS
     lwip_init();						//初始化LWIP内核
 #else
 
@@ -204,7 +206,7 @@ u8 lwip_comm_init(void)
 	printf("默认网关..........................%d.%d.%d.%d\r\n",lwipdev.gateway[0],lwipdev.gateway[1],lwipdev.gateway[2],lwipdev.gateway[3]);
 #endif
 
-#if NO_SYS==1
+#if NO_SYS
 	Netif_Init_Flag=netif_add(&lwip_netif,&ipaddr,&netmask,&gw,NULL,&ethernetif_init,&ethernet_input);//向网卡列表中添加一个网口
 	
 #if LWIP_DHCP			//如果使用DHCP的话
@@ -226,7 +228,7 @@ u8 lwip_comm_init(void)
 }   
 
 
-#if  NO_SYS==1
+#if  NO_SYS
 //当接收到数据后调用 
 void lwip_pkt_handle(void)
 {

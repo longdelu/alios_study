@@ -74,7 +74,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     {
         FreeRTOSRunTimeTicks++;
         
-#if (NO_SYS)
+#if !(NO_SYS)
         
         extern uint32_t lwip_localtime;//lwip本地时间计数器,单位:ms
 		lwip_localtime +=10; //加10
