@@ -334,6 +334,7 @@ int sys_sem_valid(sys_sem_t sem)
 void sys_sem_set_invalid(sys_sem_t sem)
 {
 	sem=NULL;
+    (void)sem;
       
 } 
 

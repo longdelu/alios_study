@@ -25,7 +25,7 @@ uint8_t *Rx_Buff; 					//以太网底层驱动接收buffers指针
 uint8_t *Tx_Buff; 					//以太网底层驱动发送buffers指针
 
 /* LAN8720 PHY Address*/ 
-#define LAN8720_PHY_ADDRESS                0X00
+
   
 //LAN8720初始化
 //返回值:0,成功;
