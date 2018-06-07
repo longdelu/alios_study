@@ -65,12 +65,12 @@ static u16_t s_nextthread = 0;
 //size:邮箱大小
 //返回值:ERR_OK,创建成功
 //         其他,创建失败
-err_t sys_mbox_new(sys_mbox_t mbox, int size)
+err_t sys_mbox_new(sys_mbox_t *mbox, int size)
 {
 	
 	(void)size;
 	
-	mbox = xQueueCreate(MAX_QUEUES, MAX_QUEUE_ENTRIES);
+	*mbox = xQueueCreate(MAX_QUEUES, MAX_QUEUE_ENTRIES);
     
     (void)mbox;
 
@@ -85,9 +85,9 @@ err_t sys_mbox_new(sys_mbox_t mbox, int size)
 } 
 //释放并删除一个消息邮箱
 //*mbox:要删除的消息邮箱
-void sys_mbox_free(sys_mbox_t mbox)
+void sys_mbox_free(sys_mbox_t *mbox)
 {
-	if( uxQueueMessagesWaiting(mbox) )
+	if( uxQueueMessagesWaiting(*mbox) )
 	{
 		/* Line for breakpoint.  Should never break here! */
 		portNOP();
@@ -96,9 +96,11 @@ void sys_mbox_free(sys_mbox_t mbox)
 #endif /* SYS_STATS */
 			
 		// TODO notify the user of failure.
+        
+        printf("free mbox failed\r\n");
 	}
 
-	vQueueDelete( mbox );
+	vQueueDelete( *mbox );
 
 #if SYS_STATS
      --lwip_stats.sys.mbox.used;
@@ -107,9 +109,9 @@ void sys_mbox_free(sys_mbox_t mbox)
 //向消息邮箱中发送一条消息(必须发送成功)
 //*mbox:消息邮箱
 //*msg:要发送的消息
-void sys_mbox_post(sys_mbox_t mbox,void *msg)
+void sys_mbox_post(sys_mbox_t *mbox,void *msg)
 {    
-	while (xQueueSendToBack(mbox, &msg, portMAX_DELAY ) != pdTRUE )
+	while (xQueueSendToBack(*mbox, &msg, portMAX_DELAY ) != pdTRUE )
     {
 		;
 	}
@@ -121,11 +123,11 @@ void sys_mbox_post(sys_mbox_t mbox,void *msg)
 //*msg:要发送的消息
 //返回值:ERR_OK,发送OK
 // 	     ERR_MEM,发送失败
-err_t sys_mbox_trypost(sys_mbox_t mbox, void *msg)
+err_t sys_mbox_trypost(sys_mbox_t *mbox, void *msg)
 { 
     err_t result;
 
-    if (xQueueSend(mbox, &msg, 0 ) == pdPASS )
+    if (xQueueSend(*mbox, &msg, 0 ) == pdPASS )
     {
         result = ERR_OK;
      }
@@ -149,7 +151,7 @@ err_t sys_mbox_trypost(sys_mbox_t mbox, void *msg)
 //timeout:超时时间，如果timeout为0的话,就一直等待
 //返回值:当timeout不为0时如果成功的话就返回等待的时间，
 //		失败的话就返回超时SYS_ARCH_TIMEOUT
-u32_t sys_arch_mbox_fetch(sys_mbox_t mbox, void **msg, u32_t timeout)
+u32_t sys_arch_mbox_fetch(sys_mbox_t *mbox, void **msg, u32_t timeout)
 { 
     void *dummyptr;
     portTickType StartTime, EndTime, Elapsed;
@@ -163,7 +165,7 @@ u32_t sys_arch_mbox_fetch(sys_mbox_t mbox, void **msg, u32_t timeout)
 		
 	if ( timeout != 0 )
 	{
-		if ( pdTRUE == xQueueReceive(mbox, &(*msg), timeout / portTICK_RATE_MS ) )
+		if ( pdTRUE == xQueueReceive(*mbox, &(*msg), timeout / portTICK_RATE_MS ) )
 		{
 			EndTime = xTaskGetTickCount();
 			Elapsed = (EndTime - StartTime) * portTICK_RATE_MS;
@@ -179,7 +181,7 @@ u32_t sys_arch_mbox_fetch(sys_mbox_t mbox, void **msg, u32_t timeout)
 	}
 	else // block forever for a message.
 	{
-		while( pdTRUE != xQueueReceive(mbox, &(*msg), portMAX_DELAY ) ){} // time is arbitrary
+		while( pdTRUE != xQueueReceive(*mbox, &(*msg), portMAX_DELAY ) ){} // time is arbitrary
 		EndTime = xTaskGetTickCount();
 		Elapsed = (EndTime - StartTime) * portTICK_RATE_MS;
 		
@@ -190,7 +192,7 @@ u32_t sys_arch_mbox_fetch(sys_mbox_t mbox, void **msg, u32_t timeout)
 //*mbox:消息邮箱
 //*msg:消息
 //返回值:等待消息所用的时间/SYS_ARCH_TIMEOUT
-u32_t sys_arch_mbox_tryfetch(sys_mbox_t mbox, void **msg)
+u32_t sys_arch_mbox_tryfetch(sys_mbox_t *mbox, void **msg)
 {
 //	return sys_arch_mbox_fetch(mbox,msg,1);//尝试获取一个消息
 	
@@ -201,7 +203,7 @@ u32_t sys_arch_mbox_tryfetch(sys_mbox_t mbox, void **msg)
 		msg = &dummyptr;
 	}
 
-	if ( pdTRUE == xQueueReceive(mbox, &(*msg), 0 ) )
+	if ( pdTRUE == xQueueReceive(*mbox, &(*msg), 0 ) )
 	{
 	  return ERR_OK;
 	}
@@ -214,13 +216,12 @@ u32_t sys_arch_mbox_tryfetch(sys_mbox_t mbox, void **msg)
 //*mbox:消息邮箱
 //返回值:1,有效.
 //      0,无效
-int sys_mbox_valid(sys_mbox_t mbox)
+int sys_mbox_valid(sys_mbox_t *mbox)
 {  
-	sys_mbox_t m_box=mbox;
 	int ucErr;
 	int ret;
 	
-	ucErr=uxQueueSpacesAvailable(m_box);
+	ucErr=uxQueueSpacesAvailable(*mbox);
     
 	ret=(ucErr <= 2) ? 1:0;
     
@@ -229,9 +230,9 @@ int sys_mbox_valid(sys_mbox_t mbox)
 
 //设置一个消息邮箱为无效
 //*mbox:消息邮箱
-void sys_mbox_set_invalid(sys_mbox_t mbox)
+void sys_mbox_set_invalid(sys_mbox_t *mbox)
 {
-	mbox=NULL;
+	*mbox=NULL;
     (void)mbox;
 } 
 //创建一个信号量
@@ -239,10 +240,10 @@ void sys_mbox_set_invalid(sys_mbox_t mbox)
 //count:信号量值
 //返回值:ERR_OK,创建OK
 // 	     ERR_MEM,创建失败
-err_t sys_sem_new(sys_sem_t sem, u8_t count)
+err_t sys_sem_new(sys_sem_t *sem, u8_t count)
 {  
 
-	vSemaphoreCreateBinary( sem );
+	vSemaphoreCreateBinary( *sem );
     
 	if( sem == NULL )
 	{
@@ -256,7 +257,7 @@ err_t sys_sem_new(sys_sem_t sem, u8_t count)
 	
 	if(count == 0)	// Means it can't be taken
 	{
-		xSemaphoreTake(sem, 1);
+		xSemaphoreTake(*sem, 1);
 	}
 
 #if SYS_STATS
@@ -273,7 +274,7 @@ err_t sys_sem_new(sys_sem_t sem, u8_t count)
 //timeout:超时时间
 //返回值:当timeout不为0时如果成功的话就返回等待的时间，
 //		失败的话就返回超时SYS_ARCH_TIMEOUT
-u32_t sys_arch_sem_wait(sys_sem_t sem, u32_t timeout)
+u32_t sys_arch_sem_wait(sys_sem_t *sem, u32_t timeout)
 { 
     portTickType StartTime, EndTime, Elapsed;
 
@@ -281,7 +282,7 @@ u32_t sys_arch_sem_wait(sys_sem_t sem, u32_t timeout)
 
 	if(	timeout != 0)
 	{
-		if( xSemaphoreTake( sem, timeout / portTICK_RATE_MS ) == pdTRUE )
+		if( xSemaphoreTake( *sem, timeout / portTICK_RATE_MS ) == pdTRUE )
 		{
 			EndTime = xTaskGetTickCount();
 			Elapsed = (EndTime - StartTime) * portTICK_RATE_MS;
@@ -295,7 +296,7 @@ u32_t sys_arch_sem_wait(sys_sem_t sem, u32_t timeout)
 	}
 	else // must block without a timeout
 	{
-		while( xSemaphoreTake( sem, portMAX_DELAY ) != pdTRUE ){}
+		while( xSemaphoreTake( *sem, portMAX_DELAY ) != pdTRUE ){}
 		EndTime = xTaskGetTickCount();
 		Elapsed = (EndTime - StartTime) * portTICK_RATE_MS;
 
@@ -305,35 +306,35 @@ u32_t sys_arch_sem_wait(sys_sem_t sem, u32_t timeout)
 }
 //发送一个信号量
 //sem:信号量指针
-void sys_sem_signal(sys_sem_t sem)
+void sys_sem_signal(sys_sem_t *sem)
 {
-	xSemaphoreGive(sem);
+	xSemaphoreGive(*sem);
 }
 //释放并删除一个信号量
 //sem:信号量指针
-void sys_sem_free(sys_sem_t sem)
+void sys_sem_free(sys_sem_t *sem)
 {
 #if SYS_STATS
       --lwip_stats.sys.sem.used;
 #endif /* SYS_STATS */
 			
-	vQueueDelete(sem);
+	vQueueDelete(*sem);
     
 } 
 //查询一个信号量的状态,无效或有效
 //sem:信号量指针
 //返回值:1,有效.
 //      0,无效
-int sys_sem_valid(sys_sem_t sem)
+int sys_sem_valid(sys_sem_t *sem)
 {
-    return uxSemaphoreGetCount(sem);
+    return uxSemaphoreGetCount(*sem);
              
 } 
 //设置一个信号量无效
 //sem:信号量指针
-void sys_sem_set_invalid(sys_sem_t sem)
+void sys_sem_set_invalid(sys_sem_t *sem)
 {
-	sem=NULL;
+	*sem=NULL;
     (void)sem;
       
 } 

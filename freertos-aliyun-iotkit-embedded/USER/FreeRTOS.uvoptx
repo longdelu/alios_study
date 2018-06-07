@@ -142,7 +142,7 @@
         <tRSysVw>1</tRSysVw>
         <sRunDeb>0</sRunDeb>
         <sLrtime>0</sLrtime>
-        <nTsel>11</nTsel>
+        <nTsel>6</nTsel>
         <sDll></sDll>
         <sDllPa></sDllPa>
         <sDlgDll></sDlgDll>
@@ -153,9 +153,14 @@
         <tDlgDll></tDlgDll>
         <tDlgPa></tDlgPa>
         <tIfile></tIfile>
-        <pMon>STLink\ST-LINKIII-KEIL_SWO.dll</pMon>
+        <pMon>Segger\JL2CM3.dll</pMon>
       </DebugOpt>
       <TargetDriverDllRegistry>
+        <SetRegEntry>
+          <Number>0</Number>
+          <Key>JL2CM3</Key>
+          <Name>-U17935099 -O78 -S2 -ZTIFSpeedSel5000 -A0 -C0 -JU1 -JI127.0.0.1 -JP0 -RST0 -N00("ARM CoreSight SW-DP") -D00(2BA01477) -L00(4) -TO18 -TC10000000 -TP21 -TDS8007 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -TB1 -TFE0 -FO15 -FD20000000 -FC1000 -FN1 -FF0STM32F4xx_1024.FLM -FS08000000 -FL0100000 -FP0($$Device:STM32F429IGTx$CMSIS\Flash\STM32F4xx_1024.FLM)</Name>
+        </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
           <Key>ARMRTXEVENTFLAGS</Key>
@@ -174,7 +179,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>DLGUARM</Key>
-          <Name>(105=-1,-1,-1,-1,0)</Name>
+          <Name>/</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -193,7 +198,7 @@
           <Type>0</Type>
           <LineNumber>97</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134267400</Address>
+          <Address>134247796</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -209,7 +214,7 @@
           <Type>0</Type>
           <LineNumber>482</LineNumber>
           <EnabledFlag>0</EnabledFlag>
-          <Address>134218496</Address>
+          <Address>134218524</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -225,7 +230,7 @@
           <Type>0</Type>
           <LineNumber>483</LineNumber>
           <EnabledFlag>0</EnabledFlag>
-          <Address>134218498</Address>
+          <Address>134218526</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -241,7 +246,7 @@
           <Type>0</Type>
           <LineNumber>480</LineNumber>
           <EnabledFlag>0</EnabledFlag>
-          <Address>134218494</Address>
+          <Address>134218522</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -257,7 +262,7 @@
           <Type>0</Type>
           <LineNumber>469</LineNumber>
           <EnabledFlag>0</EnabledFlag>
-          <Address>134218478</Address>
+          <Address>134218506</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -273,7 +278,7 @@
           <Type>0</Type>
           <LineNumber>75</LineNumber>
           <EnabledFlag>0</EnabledFlag>
-          <Address>134230356</Address>
+          <Address>134227708</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -287,18 +292,98 @@
         <Bp>
           <Number>6</Number>
           <Type>0</Type>
-          <LineNumber>11</LineNumber>
+          <LineNumber>185</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
+          <Address>134247292</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>..\iotkit-embedded\src\platform\ssl\freertos-openssl\HAL_TLS_openssl.c</Filename>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\LWIP\lwip_app\lwip_comm\lwip_comm.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression></Expression>
+          <Expression>\\LED\../LWIP/lwip_app/lwip_comm/lwip_comm.c\185</Expression>
+        </Bp>
+        <Bp>
+          <Number>7</Number>
+          <Type>0</Type>
+          <LineNumber>192</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134247310</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\LWIP\lwip_app\lwip_comm\lwip_comm.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\LED\../LWIP/lwip_app/lwip_comm/lwip_comm.c\192</Expression>
+        </Bp>
+        <Bp>
+          <Number>8</Number>
+          <Type>0</Type>
+          <LineNumber>182</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134247286</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\LWIP\lwip_app\lwip_comm\lwip_comm.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\LED\../LWIP/lwip_app/lwip_comm/lwip_comm.c\182</Expression>
+        </Bp>
+        <Bp>
+          <Number>9</Number>
+          <Type>0</Type>
+          <LineNumber>184</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134250974</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\LWIP\lwip-1.4.1\src\core\netif.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\LED\../LWIP/lwip-1.4.1/src/core/netif.c\184</Expression>
+        </Bp>
+        <Bp>
+          <Number>10</Number>
+          <Type>0</Type>
+          <LineNumber>15</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134246526</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\LWIP\lwip-1.4.1\src\netif\ethernetif.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\LED\../LWIP/lwip-1.4.1/src/netif/ethernetif.c\15</Expression>
+        </Bp>
+        <Bp>
+          <Number>11</Number>
+          <Type>0</Type>
+          <LineNumber>27</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134246618</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\LWIP\lwip-1.4.1\src\netif\ethernetif.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\LED\../LWIP/lwip-1.4.1/src/netif/ethernetif.c\27</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -321,6 +406,11 @@
           <count>3</count>
           <WinNumber>1</WinNumber>
           <ItemText>Task2Task_Handler</ItemText>
+        </Ww>
+        <Ww>
+          <count>4</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>mbox</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>
@@ -1048,7 +1138,7 @@
 
   <Group>
     <GroupName>README</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2104,7 +2194,7 @@
       <GroupNumber>14</GroupNumber>
       <FileNumber>135</FileNumber>
       <FileType>1</FileType>
-      <tvExp>0</tvExp>
+      <tvExp>1</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
       <PathWithFileName>..\LWIP\arch\sys_arch.c</PathWithFileName>
