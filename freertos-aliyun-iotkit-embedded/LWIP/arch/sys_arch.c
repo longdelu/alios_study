@@ -43,7 +43,7 @@
 #include "arch/sys_arch.h"
 #include "malloc.h"
 
-
+#if (NO_SYS==0)
 xTaskHandle xTaskGetCurrentTaskHandle( void ) PRIVILEGED_FUNCTION;
 
 struct timeoutlist
@@ -395,6 +395,16 @@ u32_t sys_now(void)
 {         
 	return freertos_now_ms(); 	//返回lwip_time;
 }
+
+#else 
+
+//为LWIP提供计时
+extern uint32_t lwip_localtime;//lwip本地时间计数器,单位:ms
+u32_t sys_now(void){
+	return lwip_localtime;
+}
+
+#endif
 
 
 

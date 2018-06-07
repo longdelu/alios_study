@@ -38,14 +38,14 @@ typedef struct
 extern __lwip_dev lwipdev;	//lwip控制结构体
 
 void lwip_pkt_handle(void);
+void lwip_periodic_handle(void);
+	
 void lwip_comm_default_ip_set(__lwip_dev *lwipx);
 u8 lwip_comm_mem_malloc(void);
 void lwip_comm_mem_free(void);
 u8 lwip_comm_init(void);
-void lwip_comm_dhcp_creat(void);
-void lwip_comm_dhcp_delete(void);
-void lwip_comm_destroy(void);
-void lwip_comm_delete_next_timeout(void);
+void lwip_dhcp_process_handle(void);
+
 #endif
 
 

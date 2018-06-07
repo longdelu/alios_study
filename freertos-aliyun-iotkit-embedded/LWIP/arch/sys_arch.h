@@ -40,6 +40,8 @@
 #define SYS_ARCH_EXT extern
 #endif
 
+#if (NO_SYS==0)
+
 /* Message queue constants. */ 
 #define MAX_QUEUES        		10	// 消息队列的数量
 #define MAX_QUEUE_ENTRIES 		20	// 每个消息队列的大小
@@ -53,6 +55,8 @@ typedef xSemaphoreHandle sys_sem_t;     //LWIP使用的信号量
 typedef xSemaphoreHandle sys_mutex_t; 	//LWIP使用的互斥信号量
 typedef xQueueHandle sys_mbox_t;        //消息队列
 typedef xTaskHandle sys_thread_t;       //线程ID,也就是任务句柄
+#endif
+
 #endif 
 
 /* __SYS_RTXC_H__ */

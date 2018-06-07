@@ -28,7 +28,7 @@ void ConfigureTimeForRunTimeStats(void)
 	//定时器3初始化，定时器时钟为90M，分频系数为90-1，所以定时器3的频率
 	//为90M/90=1M，自动重装载为50-1，那么定时器周期就是50us
 	FreeRTOSRunTimeTicks=0;
-	TIM3_Init(50-1,90-1);	//初始化TIM3
+	TIM3_Init(100-1,90-1);	//初始化TIM3
 }
 
 //通用定时器3中断初始化
@@ -73,5 +73,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     if(htim==(&TIM3_Handler))
     {
         FreeRTOSRunTimeTicks++;
+        
+        //#if (NO_SYS == 1)
+           extern uint32_t lwip_localtime;//lwip本地时间计数器,单位:ms
+		   lwip_localtime +=10; //加10
+       // #endif
+       
     }
 }
