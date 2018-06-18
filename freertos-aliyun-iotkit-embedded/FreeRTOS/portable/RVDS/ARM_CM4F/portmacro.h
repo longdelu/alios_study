@@ -144,7 +144,7 @@ typedef unsigned long UBaseType_t;
 extern void vPortEnterCritical( void );
 extern void vPortExitCritical( void );
 
-#define portDISABLE_INTERRUPTS()				vPortRaiseBASEPRI()
+#define portDISABLE_INTERRUPTS()				vPortRaiseBASEPRI()     //会屏蔽相关的优先级号大于此值的中断，优先级号越高，优先级越低，申请消息邮箱及号量时都会调用这个函数。
 #define portENABLE_INTERRUPTS()					vPortSetBASEPRI( 0 )
 #define portENTER_CRITICAL()					vPortEnterCritical()
 #define portEXIT_CRITICAL()						vPortExitCritical()

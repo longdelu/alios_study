@@ -95,6 +95,8 @@ int main(void)
 {   
     Stm32_Clock_Init(360,25,2,8);   //设置时钟,180Mhz   
     HAL_Init();                     //初始化HAL库
+    
+
     delay_init(180);                //初始化延时函数
     uart_init(115200);              //初始化串口
     LED_Init();                     //初始化LED 
@@ -110,6 +112,8 @@ int main(void)
 	printf("ATOM@ALIENTEK\r\n");
 	printf("2016/1/14\r\n");
     
+    /* 组优先级有4位，次优先级也有4位，但stm32当中只有4位有效 */
+    NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
     while(lwip_comm_init()) 	    //lwip初始化
 	{
 		printf("Lwip Init failed!"); 	//lwip初始化失败

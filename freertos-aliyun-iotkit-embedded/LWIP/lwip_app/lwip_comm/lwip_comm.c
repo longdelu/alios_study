@@ -51,7 +51,7 @@ u32 DHCPfineTimer=0;	//DHCP精细处理计时器
 u32 DHCPcoarseTimer=0;	//DHCP粗糙处理计时器
 #endif
 
-#else
+#else     /* end of NO_SYS */
 
 /////////////////////////////////////////////////////////////////////////////////
 //lwip两个任务定义(内核任务和DHCP任务)
@@ -60,14 +60,12 @@ u32 DHCPcoarseTimer=0;	//DHCP粗糙处理计时器
 StackType_t *TCPIP_THREAD_TASK_STK;	 
 
 TaskHandle_t Tcpip_xHandle = NULL;
-StaticTask_t xTcpipTaskBuffer;
 
 TaskHandle_t Dhcp_xHandle = NULL;
-StaticTask_t xDhcpTaskBuffer;
 
-//lwip DHCP任务
+//lwip DHCP任务, FreeRTOS当中，数字越高优先级越高
 //设置任务优先级
-#define LWIP_DHCP_TASK_PRIO       		7
+#define LWIP_DHCP_TASK_PRIO       		7  
 
 //设置任务堆栈大小
 #define LWIP_DHCP_STK_SIZE  		    128
@@ -76,13 +74,16 @@ StackType_t *LWIP_DHCP_TASK_STK;
 //任务函数
 void lwip_dhcp_task(void *pdata); 
 
+
+
 //用于以太网中断调用
 void lwip_pkt_handle(void)
 {
 	ethernetif_input(&lwip_netif);
 }
 
-#endif
+#endif  /* end of !NO_SYS */
+
 
 //lwip中mem和memp的内存申请
 //返回值:0,成功;
@@ -324,7 +325,7 @@ void lwip_dhcp_process_handle(void)
 }
 #endif 
 
-#else
+#else  /* end of NO_SYS */
 
 
 #if LWIP_DHCP
@@ -409,7 +410,7 @@ void lwip_dhcp_task(void *pdata)
 }
 #endif 
 
-#endif
+#endif  /* end of !NO_SYS */
 
 
 

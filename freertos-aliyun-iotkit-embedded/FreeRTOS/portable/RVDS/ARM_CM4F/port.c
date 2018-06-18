@@ -120,6 +120,8 @@ r0p1 port. */
 #define portCORTEX_M7_r0p1_ID				( 0x410FC271UL )
 #define portCORTEX_M7_r0p0_ID				( 0x410FC270UL )
 
+
+/* 便用最低的优先级，受操作系统管理 */
 #define portNVIC_PENDSV_PRI					( ( ( uint32_t ) configKERNEL_INTERRUPT_PRIORITY ) << 16UL )
 #define portNVIC_SYSTICK_PRI				( ( ( uint32_t ) configKERNEL_INTERRUPT_PRIORITY ) << 24UL )
 

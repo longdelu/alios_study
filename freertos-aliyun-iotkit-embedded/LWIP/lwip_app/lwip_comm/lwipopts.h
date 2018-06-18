@@ -13,7 +13,7 @@
 //使用4字节对齐模式
 #define MEM_ALIGNMENT           4  
 #define SYS_LIGHTWEIGHT_PROT    1		//为1时使用实时操作系统的轻量级保护,保护关键代码不被中断打断
-#define NO_SYS                  0  		//使用操作系统
+#define NO_SYS                  0  		//有无使用操作系统， 为0 例用操作系统，1不使用操作系统
 #define MEM_ALIGNMENT           4  		//使用4字节对齐模式
 #define MEM_SIZE                16000 	//内存堆heap大小
 #define MEMP_NUM_PBUF           20 		//MEMP_NUM_PBUF:memp结构的pbuf数量,如果应用从ROM或者静态存储区发送大量数据时,这个值应该设置大一点

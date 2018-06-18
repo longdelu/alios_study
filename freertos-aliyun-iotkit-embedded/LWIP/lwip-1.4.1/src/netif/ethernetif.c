@@ -4,7 +4,7 @@
 #include "netif/etharp.h"  
 #include "string.h"  
 
-//由ethernetif_init()调用用于初始化硬  件
+//由ethernetif_init()调用用于初始化硬件,驱动需要实现的函数
 //netif:网卡结构体指针 
 //返回值:ERR_OK,正常
 //       其他,失败
@@ -100,7 +100,7 @@ error:
     INTX_ENABLE();
     return errval;
 }  
-///用于接收数据包的最底层函数
+///用于接收数据包的最底层函数，驱动需要实现的函数(lwip通过ethernetif_input调用该函数)
 //neitif:网卡结构体指针
 //返回值:pbuf数据结构体指针
 static struct pbuf * low_level_input(struct netif *netif)

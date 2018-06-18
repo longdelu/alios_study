@@ -102,7 +102,7 @@ struct sys_timeouts {
 #if LWIP_COMPAT_MUTEX
 /* for old ports that don't have mutexes: define them to binary semaphores */
 #define sys_mutex_t                   sys_sem_t
-#define sys_mutex_new(mutex)          sys_sem_new(*mutex, 1)
+#define sys_mutex_new(mutex)          sys_sem_new(mutex, 1)
 #define sys_mutex_lock(mutex)         sys_sem_wait(mutex)
 #define sys_mutex_unlock(mutex)       sys_sem_signal(mutex)
 #define sys_mutex_free(mutex)         sys_sem_free(mutex)
