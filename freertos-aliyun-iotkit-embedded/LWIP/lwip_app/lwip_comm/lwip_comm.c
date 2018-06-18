@@ -217,6 +217,7 @@ u8 lwip_comm_init(void)
 
 #else 
 
+   portENABLE_INTERRUPTS(); //重新使能中断
    Netif_Init_Flag=netif_add(&lwip_netif,&ipaddr,&netmask,&gw,NULL,&ethernetif_init,&tcpip_input);//向网卡列表中添加一个网口
 #endif  
 	if(Netif_Init_Flag==NULL)return 4;//网卡添加失败 
@@ -340,7 +341,7 @@ void lwip_comm_dhcp_creat(void)
     //创建DHCP任务
     xTaskCreate(
                 lwip_dhcp_task,           // Function that implements the task.
-                "NAME",                   // Text name for the task.
+                "DHCP",                   // Text name for the task.
                 LWIP_DHCP_STK_SIZE,       // Stack size in words, not bytes.
                 (void*)0,                 // Parameter passed into the task.
                 LWIP_DHCP_TASK_PRIO,      // Priority at which the task is created.           
