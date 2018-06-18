@@ -5,7 +5,7 @@
 
 //线程优先级
 #ifndef TCPIP_THREAD_PRIO
-#define TCPIP_THREAD_PRIO		5	//定义内核任务的优先级为5
+#define TCPIP_THREAD_PRIO		9	//定义内核任务的优先级为6
 #endif
 #undef  DEFAULT_THREAD_PRIO
 #define DEFAULT_THREAD_PRIO		7

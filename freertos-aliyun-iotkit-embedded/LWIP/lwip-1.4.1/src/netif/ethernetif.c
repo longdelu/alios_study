@@ -1,8 +1,10 @@
 #include "netif/ethernetif.h" 
 #include "lan8720.h"  
-#include "lwip_comm.h" 
 #include "netif/etharp.h"  
 #include "string.h"  
+
+xSemaphoreHandle s_xSemaphore = NULL;
+
 
 //由ethernetif_init()调用用于初始化硬件,驱动需要实现的函数
 //netif:网卡结构体指针 
@@ -20,11 +22,29 @@ static err_t low_level_init(struct netif *netif)
 	netif->hwaddr[5]=lwipdev.mac[5];
 	netif->mtu=1500; //最大允许传输单元,允许该网卡广播和ARP功能
 
-	netif->flags = NETIF_FLAG_BROADCAST|NETIF_FLAG_ETHARP|NETIF_FLAG_LINK_UP;
-	
+	netif->flags = NETIF_FLAG_BROADCAST|NETIF_FLAG_ETHARP|NETIF_FLAG_LINK_UP;  
+    
     HAL_ETH_DMATxDescListInit(&ETH_Handler,DMATxDscrTab,Tx_Buff,ETH_TXBUFNB);//初始化发送描述符
     HAL_ETH_DMARxDescListInit(&ETH_Handler,DMARxDscrTab,Rx_Buff,ETH_RXBUFNB);//初始化接收描述符
-	HAL_ETH_Start(&ETH_Handler); //开启MAC和DMA				
+
+#if !NO_SYS    
+    /* create binary semaphore used for informing ethernetif of frame reception */
+    if (s_xSemaphore == NULL)
+    {
+        s_xSemaphore= xSemaphoreCreateCounting(20,0);
+    }
+
+    /* create the task that handles the ETH_MAC */
+
+    xTaskCreate(lwip_pkt_handle, "Eth_if", netifINTERFACE_TASK_STACK_SIZE, NULL,
+                netifINTERFACE_TASK_PRIORITY,NULL); 
+    
+    portENABLE_INTERRUPTS(); //重新使能中断
+#endif 
+	
+         
+	HAL_ETH_Start(&ETH_Handler); //开启MAC和DMA	
+    
 	return ERR_OK;
 } 
 //用于发送数据包的最底层函数(lwip通过netif->linkoutput指向该函数)

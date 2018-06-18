@@ -3,6 +3,7 @@
 
 #include "lan8720.h" 
 #include "sys.h"
+#include "lwipopts.h"
 
 //////////////////////////////////////////////////////////////////////////////////	 
 //本程序只供学习使用，未经作者许可，不得用于其它任何用途
@@ -39,7 +40,7 @@ typedef struct
 }__lwip_dev;
 extern __lwip_dev lwipdev;	//lwip控制结构体
 
-void lwip_pkt_handle(void);
+void lwip_pkt_handle (void *p_par);
 
 
 void lwip_comm_default_ip_set(__lwip_dev *lwipx);

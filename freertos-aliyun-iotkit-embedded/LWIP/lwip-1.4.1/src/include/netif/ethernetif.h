@@ -2,6 +2,7 @@
 #define __ETHERNETIF_H__
 #include "lwip/err.h"
 #include "lwip/netif.h"
+#include "lwip_comm.h" 
 //////////////////////////////////////////////////////////////////////////////////	 
 //本程序只供学习使用，未经作者许可，不得用于其它任何用途
 //ALIENTEK STM32F407开发板
@@ -22,6 +23,14 @@
 //网卡的名字
 #define IFNAME0 'e'
 #define IFNAME1 'n'
+
+extern xSemaphoreHandle s_xSemaphore;
+
+#define netifINTERFACE_TASK_STACK_SIZE		( 350 )
+#define netifINTERFACE_TASK_PRIORITY		( configMAX_PRIORITIES - 1 )
+#define netifGUARD_BLOCK_TIME			    ( 250 )
+/* The time to block waiting for input. */
+#define emacBLOCK_TIME_WAITING_FOR_INPUT	(( portTickType )100 )
  
 
 err_t ethernetif_init(struct netif *netif);

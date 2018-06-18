@@ -442,9 +442,9 @@ void vPortEnterCritical( void )
 	{
 		configASSERT( ( portNVIC_INT_CTRL_REG & portVECTACTIVE_MASK ) == 0 );
         
-        while(1) {
-            
-        }
+//        while(1) {
+//            
+//        }
 	}
 }
 /*-----------------------------------------------------------*/
@@ -772,6 +772,11 @@ __asm uint32_t vPortGetIPSR( void )
 			http://www.freertos.org/RTOS-Cortex-M3-M4.html
 			http://www.freertos.org/FAQHelp.html */
 			configASSERT( ucCurrentPriority >= ucMaxSysCallPriority );
+            
+//            while(1) {
+//                ;
+//            }
+              
 		}
 
 		/* Priority grouping:  The interrupt controller (NVIC) allows the bits

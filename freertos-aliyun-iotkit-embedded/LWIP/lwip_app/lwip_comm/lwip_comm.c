@@ -77,9 +77,20 @@ void lwip_dhcp_task(void *pdata);
 
 
 //用于以太网中断调用
-void lwip_pkt_handle(void)
+void lwip_pkt_handle (void *p_par)
 {
-	ethernetif_input(&lwip_netif);
+
+    (void)p_par;
+    
+    for( ;; )
+    {
+        if (xSemaphoreTake(s_xSemaphore, emacBLOCK_TIME_WAITING_FOR_INPUT)==pdTRUE)
+        {
+            ethernetif_input(&lwip_netif);
+        }
+    }    
+    
+	
 }
 
 #endif  /* end of !NO_SYS */
@@ -189,7 +200,8 @@ u8 lwip_comm_init(void)
 #if NO_SYS
     lwip_init();						//初始化LWIP内核
 #else
-
+    HAL_NVIC_SetPriority(ETH_IRQn,2, 0);
+    HAL_NVIC_SetPriority(ETH_WKUP_IRQn,2, 1);
  	tcpip_init(NULL,NULL);				//初始化tcp ip内核,该函数里面会创建tcpip_thread内核任务
 #endif
 
@@ -216,8 +228,6 @@ u8 lwip_comm_init(void)
 #endif
 
 #else 
-
-   portENABLE_INTERRUPTS(); //重新使能中断
    Netif_Init_Flag=netif_add(&lwip_netif,&ipaddr,&netmask,&gw,NULL,&ethernetif_init,&tcpip_input);//向网卡列表中添加一个网口
 #endif  
 	if(Netif_Init_Flag==NULL)return 4;//网卡添加失败 
@@ -232,10 +242,12 @@ u8 lwip_comm_init(void)
 
 #if  NO_SYS
 //当接收到数据后调用 
-void lwip_pkt_handle(void)
+void lwip_pkt_handle (void *p_par)
 {
-  //从网络缓冲区中读取接收到的数据包并将其发送给LWIP处理 
- ethernetif_input(&lwip_netif);
+
+    (void)p_par;
+    //从网络缓冲区中读取接收到的数据包并将其发送给LWIP处理 
+    ethernetif_input(&lwip_netif);
 }
 
 //LWIP轮询任务

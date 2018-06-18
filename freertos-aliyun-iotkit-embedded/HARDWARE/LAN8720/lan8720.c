@@ -141,19 +141,53 @@ u8 LAN8720_Get_Speed(void)
 	return speed;
 }
 
-extern void lwip_pkt_handle(void);		//在lwip_comm.c里面定义
 //中断服务函数
 void ETH_IRQHandler(void)
 {
-    //INTX_DISABLE(); 
+    
+
+#if !NO_SYS     
+    extern xSemaphoreHandle s_xSemaphore;
+	portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+    
+#else
+    
+    INTX_DISABLE();
+#endif
+    
     while(ETH_GetRxPktSize(ETH_Handler.RxDesc))   
     {
-        lwip_pkt_handle();//处理以太网数据，即将数据提交给LWIP
+      
+#if !NO_SYS     
+    
+		/* Give the semaphore to wakeup LwIP task */
+		xSemaphoreGiveFromISR(s_xSemaphore, &xHigherPriorityTaskWoken ); 
+    
+#else
+                      
+        lwip_pkt_handle(NULL);//处理以太网数据，即将数据提交给LWIP
+#endif
     }
+    
     //清除中断标志位
     __HAL_ETH_DMA_CLEAR_IT(&ETH_Handler,ETH_DMA_IT_R); 
-    __HAL_ETH_DMA_CLEAR_IT(&ETH_Handler,ETH_DMA_IT_NIS); 
-    //INTX_ENABLE();  
+    __HAL_ETH_DMA_CLEAR_IT(&ETH_Handler,ETH_DMA_IT_NIS);     
+
+#if !NO_SYS    
+	/* Switch tasks if necessary. */	
+	if( xHigherPriorityTaskWoken != pdFALSE )
+	{
+		portEND_SWITCHING_ISR( xHigherPriorityTaskWoken );
+	}
+#endif	    
+    
+
+    
+#if  NO_SYS     
+    INTX_ENABLE();
+ #endif
+
+    
 }
 
 //获取接收到的帧长度

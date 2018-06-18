@@ -27,7 +27,7 @@
 ************************************************/
 
 //任务优先级
-#define START_TASK_PRIO			1
+#define START_TASK_PRIO			2
 //任务堆栈大小	
 #define START_STK_SIZE 			256  
 //任务句柄
@@ -36,7 +36,7 @@ TaskHandle_t StartTask_Handler;
 void start_task(void *pvParameters);
 
 //任务优先级
-#define LOW_TASK_PRIO			2
+#define LOW_TASK_PRIO			3
 //任务堆栈大小	
 #define LOW_STK_SIZE 			256  
 //任务句柄
@@ -45,7 +45,7 @@ TaskHandle_t LowTask_Handler;
 void low_task(void *pvParameters);
 
 //任务优先级
-#define MIDDLE_TASK_PRIO 		3
+#define MIDDLE_TASK_PRIO 		4
 //任务堆栈大小	
 #define MIDDLE_STK_SIZE  		256 
 //任务句柄
@@ -54,7 +54,7 @@ TaskHandle_t MiddleTask_Handler;
 void middle_task(void *pvParameters);
 
 //任务优先级
-#define HIGH_TASK_PRIO 			4
+#define HIGH_TASK_PRIO 			5
 //任务堆栈大小	
 #define HIGH_STK_SIZE  			256 
 //任务句柄
@@ -113,7 +113,8 @@ int main(void)
 	printf("2016/1/14\r\n");
     
     /* 组优先级有4位，次优先级也有4位，但stm32当中只有4位有效 */
-    NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
+//    NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
+    
     while(lwip_comm_init()) 	    //lwip初始化
 	{
 		printf("Lwip Init failed!"); 	//lwip初始化失败
@@ -174,9 +175,7 @@ void start_task(void *pvParameters)
 //高优先级任务的任务函数
 void high_task(void *pvParameters)
 {
-
-    
-	
+  
 	while(1)
 	{
 #if LWIP_DHCP									//当开启DHCP的时候
