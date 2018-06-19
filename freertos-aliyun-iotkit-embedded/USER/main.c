@@ -198,10 +198,11 @@ void high_task(void *pvParameters)
 void middle_task(void *pvParameters)
 {
 
-    HAL_Printf("middle_task  Running!\r\n");
+    //HAL_Printf("middle_task  Running!\r\n");
 
 	while(1)
 	{
+        HAL_Printf("middle_task  Running!\r\n");
         LED0 = !LED0;
 		vTaskDelay(500);	//延时500ms，也就是500个时钟节拍	
 
@@ -216,6 +217,7 @@ void low_task(void *pvParameters)
 
 	while(1)
 	{
+        HAL_Printf("lowerst_task  Running!\r\n");
 		//xSemaphoreTake(MutexSemaphore,portMAX_DELAY);	//获取互斥信号量
 
 		//xSemaphoreGive(MutexSemaphore);					//释放互斥信号量

@@ -54,6 +54,8 @@ static err_t low_level_init(struct netif *netif)
 //       ERR_MEM,发送失败
 static err_t low_level_output(struct netif *netif, struct pbuf *p)
 {
+    
+    
     err_t errval;
     struct pbuf *q;
     uint8_t *buffer=(uint8_t *)(ETH_Handler.TxDesc->Buffer1Addr);
@@ -65,59 +67,88 @@ static err_t low_level_output(struct netif *netif, struct pbuf *p)
 
     DmaTxDesc = ETH_Handler.TxDesc;
     bufferoffset = 0;
+    
+#if !N0_SYS
+    
+    static xSemaphoreHandle xTxSemaphore = NULL;
+
+    if (xTxSemaphore == NULL)
+    {
+        vSemaphoreCreateBinary (xTxSemaphore);
+    }
+
+    if (xSemaphoreTake(xTxSemaphore, netifGUARD_BLOCK_TIME))
+ 
+#else 
 
     INTX_DISABLE();
-    //从pbuf中拷贝要发送的数据
-    for(q=p;q!=NULL;q=q->next)
+    
+#endif /* end NO_SYS */
+    
     {
-        //判断此发送描述符是否有效，即判断此发送描述符是否归以太网DMA所有
-        if((DmaTxDesc->Status&ETH_DMATXDESC_OWN)!=(uint32_t)RESET)
+ 
+        
+        //从pbuf中拷贝要发送的数据
+        for(q=p;q!=NULL;q=q->next)
         {
-            errval=ERR_USE;
-            goto error;             //发送描述符无效，不可用
-        }
-        byteslefttocopy=q->len;     //要发送的数据长度
-        payloadoffset=0;
-   
-        //将pbuf中要发送的数据写入到以太网发送描述符中，有时候我们要发送的数据可能大于一个以太网
-        //描述符的Tx Buffer，因此我们需要分多次将数据拷贝到多个发送描述符中
-        while((byteslefttocopy+bufferoffset)>ETH_TX_BUF_SIZE )
-        {
-            //将数据拷贝到以太网发送描述符的Tx Buffer中
-            memcpy((uint8_t*)((uint8_t*)buffer+bufferoffset),(uint8_t*)((uint8_t*)q->payload+payloadoffset),(ETH_TX_BUF_SIZE-bufferoffset));
-            //DmaTxDsc指向下一个发送描述符
-            DmaTxDesc=(ETH_DMADescTypeDef *)(DmaTxDesc->Buffer2NextDescAddr);
-            //检查新的发送描述符是否有效
+            //判断此发送描述符是否有效，即判断此发送描述符是否归以太网DMA所有
             if((DmaTxDesc->Status&ETH_DMATXDESC_OWN)!=(uint32_t)RESET)
             {
-                errval = ERR_USE;
-                goto error;     //发送描述符无效，不可用
+                errval=ERR_USE;
+                goto error;             //发送描述符无效，不可用
             }
-            buffer=(uint8_t *)(DmaTxDesc->Buffer1Addr);   //更新buffer地址，指向新的发送描述符的Tx Buffer
-            byteslefttocopy=byteslefttocopy-(ETH_TX_BUF_SIZE-bufferoffset);
-            payloadoffset=payloadoffset+(ETH_TX_BUF_SIZE-bufferoffset);
-            framelength=framelength+(ETH_TX_BUF_SIZE-bufferoffset);
-            bufferoffset=0;
+            byteslefttocopy=q->len;     //要发送的数据长度
+            payloadoffset=0;
+       
+            //将pbuf中要发送的数据写入到以太网发送描述符中，有时候我们要发送的数据可能大于一个以太网
+            //描述符的Tx Buffer，因此我们需要分多次将数据拷贝到多个发送描述符中
+            while((byteslefttocopy+bufferoffset)>ETH_TX_BUF_SIZE )
+            {
+                //将数据拷贝到以太网发送描述符的Tx Buffer中
+                memcpy((uint8_t*)((uint8_t*)buffer+bufferoffset),(uint8_t*)((uint8_t*)q->payload+payloadoffset),(ETH_TX_BUF_SIZE-bufferoffset));
+                //DmaTxDsc指向下一个发送描述符
+                DmaTxDesc=(ETH_DMADescTypeDef *)(DmaTxDesc->Buffer2NextDescAddr);
+                //检查新的发送描述符是否有效
+                if((DmaTxDesc->Status&ETH_DMATXDESC_OWN)!=(uint32_t)RESET)
+                {
+                    errval = ERR_USE;
+                    goto error;     //发送描述符无效，不可用
+                }
+                buffer=(uint8_t *)(DmaTxDesc->Buffer1Addr);   //更新buffer地址，指向新的发送描述符的Tx Buffer
+                byteslefttocopy=byteslefttocopy-(ETH_TX_BUF_SIZE-bufferoffset);
+                payloadoffset=payloadoffset+(ETH_TX_BUF_SIZE-bufferoffset);
+                framelength=framelength+(ETH_TX_BUF_SIZE-bufferoffset);
+                bufferoffset=0;
+            }
+            //拷贝剩余的数据
+            memcpy( (uint8_t*)((uint8_t*)buffer+bufferoffset),(uint8_t*)((uint8_t*)q->payload+payloadoffset),byteslefttocopy );
+            bufferoffset=bufferoffset+byteslefttocopy;
+            framelength=framelength+byteslefttocopy;
         }
-        //拷贝剩余的数据
-        memcpy( (uint8_t*)((uint8_t*)buffer+bufferoffset),(uint8_t*)((uint8_t*)q->payload+payloadoffset),byteslefttocopy );
-        bufferoffset=bufferoffset+byteslefttocopy;
-        framelength=framelength+byteslefttocopy;
-    }
-    //当所有要发送的数据都放进发送描述符的Tx Buffer以后就可发送此帧了
-    HAL_ETH_TransmitFrame(&ETH_Handler,framelength);
-    errval = ERR_OK;
+        //当所有要发送的数据都放进发送描述符的Tx Buffer以后就可发送此帧了
+        HAL_ETH_TransmitFrame(&ETH_Handler,framelength);
+        errval = ERR_OK;        
 error:    
-    //发送缓冲区发生下溢，一旦发送缓冲区发生下溢TxDMA会进入挂起状态
-    if((ETH_Handler.Instance->DMASR&ETH_DMASR_TUS)!=(uint32_t)RESET)
-    {
-        //清除下溢标志
-        ETH_Handler.Instance->DMASR = ETH_DMASR_TUS;
-        //当发送帧中出现下溢错误的时候TxDMA会挂起，这时候需要向DMATPDR寄存器
-        //随便写入一个值来将其唤醒，此处我们写0
-        ETH_Handler.Instance->DMATPDR=0;
+        //发送缓冲区发生下溢，一旦发送缓冲区发生下溢TxDMA会进入挂起状态
+        if((ETH_Handler.Instance->DMASR&ETH_DMASR_TUS)!=(uint32_t)RESET)
+        {
+            //清除下溢标志
+            ETH_Handler.Instance->DMASR = ETH_DMASR_TUS;
+            //当发送帧中出现下溢错误的时候TxDMA会挂起，这时候需要向DMATPDR寄存器
+            //随便写入一个值来将其唤醒，此处我们写0
+            ETH_Handler.Instance->DMATPDR=0;
+        }
+        
+#if !N0_SYS       
+        xSemaphoreGive(xTxSemaphore);  
+#endif        
+        
     }
+    
+#if N0_SYS     
     INTX_ENABLE();
+#endif 
+    
     return errval;
 }  
 ///用于接收数据包的最底层函数，驱动需要实现的函数(lwip通过ethernetif_input调用该函数)
@@ -137,8 +168,10 @@ static struct pbuf * low_level_input(struct netif *netif)
   
     if(HAL_ETH_GetReceivedFrame(&ETH_Handler)!=HAL_OK)  //判断是否接收到数据
     return NULL;
-    
+
+#if NO_SYS   
     INTX_DISABLE();
+#endif      
     len=ETH_Handler.RxFrameInfos.length;                //获取接收到的以太网帧长度
     buffer=(uint8_t *)ETH_Handler.RxFrameInfos.buffer;  //获取接收到的以太网帧的数据buffer
   
@@ -185,9 +218,14 @@ static struct pbuf * low_level_input(struct netif *netif)
         //当接收缓冲区不可用的时候RxDMA会进去挂起状态，通过向DMARPDR写入任意一个值来唤醒Rx DMA
         ETH_Handler.Instance->DMARPDR=0;
     }
+    
+#if NO_SYS      
     INTX_ENABLE();
+#endif
+    
     return p;
 }
+
 //网卡接收数据(lwip直接调用) 
 //netif:网卡结构体指针
 //返回值:ERR_OK,发送正常

@@ -84,6 +84,7 @@ void lwip_pkt_handle (void *p_par)
     
     for( ;; )
     {
+        printf("ethernetif input  Running!\r\n");
         if (xSemaphoreTake(s_xSemaphore, emacBLOCK_TIME_WAITING_FOR_INPUT)==pdTRUE)
         {
             ethernetif_input(&lwip_netif);
