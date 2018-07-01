@@ -21,13 +21,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
-//#include <sys/types.h>
-//#include <sys/socket.h>
+#include "lwip/sockets.h"
+#include "lwip/tcp.h"
+
 #include <time.h>
-//#include <unistd.h>
-//#include <fcntl.h>
-//#include <netinet/tcp.h>
-//#include <netdb.h>
+#include "lwip/netdb.h"
 
 #include "iot_import.h"
 
@@ -38,12 +36,12 @@
     } while(0);
 
 
-static uint64_t _linux_get_time_ms(void)
+static uint64_t _get_time_ms(void)
 {
     return HAL_UptimeMs();
 }
 
-static uint64_t _linux_time_left(uint64_t t_end, uint64_t t_now)
+static uint64_t _time_left(uint64_t t_end, uint64_t t_now)
 {
     uint64_t t_left;
 

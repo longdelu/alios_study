@@ -18,6 +18,10 @@ typedef signed     long    s32_t;   //有符号32位整数
 typedef u32_t mem_ptr_t;            //内存地址型数据
 typedef int sys_prot_t;				//临界保护型数据
 
+extern uint32_t Enter_Critical(void);
+
+extern void Exit_Critical(uint32_t lev);
+
 //使用操作系统时的临界区保护，
 //当定义了OS_CRITICAL_METHOD时就说明使用了操作系统
 #if OS_CRITICAL_METHOD == 1
