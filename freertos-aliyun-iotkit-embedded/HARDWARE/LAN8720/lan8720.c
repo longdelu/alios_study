@@ -109,7 +109,7 @@ void HAL_ETH_MspInit(ETH_HandleTypeDef *heth)
     GPIO_Initure.Pin=GPIO_PIN_13|GPIO_PIN_14;   //PG13,14
     HAL_GPIO_Init(GPIOG,&GPIO_Initure);         //初始化
     
-    HAL_NVIC_SetPriority(ETH_IRQn,0,0);         //网络中断优先级应该高一点
+    HAL_NVIC_SetPriority(ETH_IRQn,2,0);         //网络中断优先级应该高一点
     HAL_NVIC_EnableIRQ(ETH_IRQn);
 }
 //读取PHY寄存器值
@@ -147,12 +147,9 @@ void ETH_IRQHandler(void)
     
 
 #if !NO_SYS     
-    extern xSemaphoreHandle s_xSemaphore;
-	portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+//    extern xSemaphoreHandle s_xSemaphore;
+//	portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
     
-#else
-    
-    INTX_DISABLE();
 #endif
     
     while(ETH_GetRxPktSize(ETH_Handler.RxDesc))   
@@ -161,7 +158,9 @@ void ETH_IRQHandler(void)
 #if !NO_SYS     
     
 		/* Give the semaphore to wakeup LwIP task */
-		xSemaphoreGiveFromISR(s_xSemaphore, &xHigherPriorityTaskWoken ); 
+//		xSemaphoreGiveFromISR(s_xSemaphore, &xHigherPriorityTaskWoken ); 
+        
+        lwip_pkt_handle(NULL);//处理以太网数据，即将数据提交给LWIP
     
 #else
                       
@@ -174,18 +173,15 @@ void ETH_IRQHandler(void)
     __HAL_ETH_DMA_CLEAR_IT(&ETH_Handler,ETH_DMA_IT_NIS);     
 
 #if !NO_SYS    
-	/* Switch tasks if necessary. */	
-	if( xHigherPriorityTaskWoken != pdFALSE )
-	{
-		portEND_SWITCHING_ISR( xHigherPriorityTaskWoken );
-	}
+//	/* Switch tasks if necessary. */	
+//	if( xHigherPriorityTaskWoken != pdFALSE )
+//	{
+//		portEND_SWITCHING_ISR( xHigherPriorityTaskWoken );
+//	}
 #endif	    
     
 
     
-#if  NO_SYS     
-    INTX_ENABLE();
- #endif
 
     
 }

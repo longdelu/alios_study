@@ -114,16 +114,15 @@ int main(void)
     
     /* 组优先级有4位，次优先级也有4位，但stm32当中只有4位有效 */
 //    NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
-    
     while(lwip_comm_init()) 	    //lwip初始化
 	{
 		printf("Lwip Init failed!"); 	//lwip初始化失败
 
 		delay_ms(500);
-	}
+	}    
     
     printf("lwip init sucess\r\n");
-    
+   
     //创建开始任务
     xTaskCreate((TaskFunction_t )start_task,            //任务函数
                 (const char*    )"start_task",          //任务名称
@@ -137,6 +136,10 @@ int main(void)
 //开始任务任务函数
 void start_task(void *pvParameters)
 {
+    
+
+    
+
     taskENTER_CRITICAL();           //进入临界区
 	
 	//创建互斥信号量

@@ -55,6 +55,12 @@ typedef xSemaphoreHandle sys_sem_t;     //LWIP使用的信号量
 typedef xSemaphoreHandle sys_mutex_t; 	//LWIP使用的互斥信号量
 typedef xQueueHandle sys_mbox_t;        //消息队列
 typedef xTaskHandle sys_thread_t;       //线程ID,也就是任务句柄
+
+void Exit_Critical(uint32_t lev);
+
+/*用在cc.YS_ARCH_UNPROTECT(lev)*/
+void Exit_Critical(uint32_t lev);
+
 #endif
 
 #endif 

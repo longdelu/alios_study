@@ -44,6 +44,9 @@
 #include "malloc.h"
 
 #if !NO_SYS
+
+#define SCB_ICSR_REG		( * ( ( volatile uint32_t * ) 0xe000ed04 ) )
+    
 xTaskHandle xTaskGetCurrentTaskHandle( void ) PRIVILEGED_FUNCTION;
 
 struct timeoutlist
@@ -110,11 +113,19 @@ void sys_mbox_free(sys_mbox_t *mbox)
 //*mbox:消息邮箱
 //*msg:要发送的消息
 void sys_mbox_post(sys_mbox_t *mbox,void *msg)
-{    
-	while (xQueueSendToBack(*mbox, &msg, portMAX_DELAY ) != pdTRUE )
-    {
-		;
+{  
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;  
+    
+    if(SCB_ICSR_REG&0xFF)  //在中断里
+	{
+       while(xQueueSendToBackFromISR(*mbox, &msg, &xHigherPriorityTaskWoken) != pdPASS);
+	   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);;
 	}
+	else  //在线程
+	{
+	    while (xQueueSendToBack(*mbox, &msg, portMAX_DELAY ) != pdTRUE );
+	}
+    
 }
 //尝试向一个消息邮箱发送消息
 //此函数相对于sys_mbox_post函数只发送一次消息，
@@ -125,23 +136,35 @@ void sys_mbox_post(sys_mbox_t *mbox,void *msg)
 // 	     ERR_MEM,发送失败
 err_t sys_mbox_trypost(sys_mbox_t *mbox, void *msg)
 { 
-    err_t result;
+    err_t result = ERR_OK;
+    
+    
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;  
+    
+    if(SCB_ICSR_REG&0xFF)//在中断里
+	{
+		if(xQueueSendToBackFromISR(*mbox, &msg, &xHigherPriorityTaskWoken)!= pdPASS) {
 
-    if (xQueueSend(*mbox, &msg, 0 ) == pdPASS )
-    {
-        result = ERR_OK;
-     }
-     else 
-	 {
-        // could not post, queue must be full
-        result = ERR_MEM;
-			
+#if SYS_STATS
+        lwip_stats.sys.mbox.err++;
+#endif /* SYS_STATS */            
+	        return ERR_MEM;
+        }
+		portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+	}
+	else  //在线程
+	{
+       if (xQueueSend(*mbox, &msg, 0 ) != pdPASS )
+       {
 #if SYS_STATS
         lwip_stats.sys.mbox.err++;
 #endif /* SYS_STATS */
-			
-     }
+           result = ERR_MEM;
+       }
+	}
 
+
+			   
      return result;
 }
 
@@ -218,14 +241,12 @@ u32_t sys_arch_mbox_tryfetch(sys_mbox_t *mbox, void **msg)
 //      0,无效
 int sys_mbox_valid(sys_mbox_t *mbox)
 {  
-	int ucErr;
-	int ret;
-	
-	ucErr=uxQueueSpacesAvailable(*mbox);
+	if(*mbox != NULL)
+	{
+	   return 1;
+	}		
+	return 0;
     
-	ret=(ucErr <= 2) ? 1:0;
-    
-	return ret; 
 } 
 
 //设置一个消息邮箱为无效
@@ -356,6 +377,9 @@ void sys_init(void)
 	s_nextthread = 0;
 } 
 
+
+
+
 //创建一个新进程
 //*name:进程名称
 //thred:进程任务函数
@@ -364,7 +388,7 @@ void sys_init(void)
 //prio:进程任务的优先级
 sys_thread_t sys_thread_new(const char *name, lwip_thread_fn thread, void *arg, int stacksize, int prio)
 {
-    xTaskHandle CreatedTask;
+    static xTaskHandle CreatedTask;
     int result;
 
     if ( s_nextthread < SYS_THREAD_MAX )
@@ -395,6 +419,33 @@ sys_thread_t sys_thread_new(const char *name, lwip_thread_fn thread, void *arg, 
 u32_t sys_now(void)
 {         
 	return freertos_now_ms(); 	//返回lwip_time;
+}
+
+
+/*用在cc.h的SYS_ARCH_PROTECT(lev)*/
+uint32_t Enter_Critical(void)
+{
+	if(SCB_ICSR_REG&0xFF)//在中断里
+	{
+		return taskENTER_CRITICAL_FROM_ISR();
+	}
+	else  //在线程
+	{
+		taskENTER_CRITICAL();
+		return 0;
+	}
+}
+/*用在cc.YS_ARCH_UNPROTECT(lev)*/
+void Exit_Critical(uint32_t lev)
+{
+	if(SCB_ICSR_REG&0xFF)//在中断里
+	{
+		taskEXIT_CRITICAL_FROM_ISR(lev);
+	}
+	else  //在线程
+	{
+		taskEXIT_CRITICAL();
+	}
 }
 
 #else 

@@ -82,14 +82,16 @@ void lwip_pkt_handle (void *p_par)
 
     (void)p_par;
     
-    for( ;; )
-    {
-        printf("ethernetif input  Running!\r\n");
-        if (xSemaphoreTake(s_xSemaphore, emacBLOCK_TIME_WAITING_FOR_INPUT)==pdTRUE)
-        {
-            ethernetif_input(&lwip_netif);
-        }
-    }    
+    ethernetif_input(&lwip_netif);
+    
+//    for( ;; )
+//    {
+//        printf("ethernetif input  Running!\r\n");
+//        if (xSemaphoreTake(s_xSemaphore, emacBLOCK_TIME_WAITING_FOR_INPUT)==pdTRUE)
+//        {
+//            ethernetif_input(&lwip_netif);
+//        }
+//    }    
     
 	
 }
@@ -201,8 +203,11 @@ u8 lwip_comm_init(void)
 #if NO_SYS
     lwip_init();						//初始化LWIP内核
 #else
-    HAL_NVIC_SetPriority(ETH_IRQn,2, 0);
-    HAL_NVIC_SetPriority(ETH_WKUP_IRQn,2, 1);
+
+//    HAL_NVIC_SetPriority(SysTick_IRQn,15, 0);
+//    HAL_NVIC_EnableIRQ(SysTick_IRQn);
+//    HAL_NVIC_SetPriority(PendSV_IRQn,15, 0);
+//    HAL_NVIC_EnableIRQ(SysTick_IRQn);
  	tcpip_init(NULL,NULL);				//初始化tcp ip内核,该函数里面会创建tcpip_thread内核任务
 #endif
 
@@ -347,8 +352,7 @@ void lwip_dhcp_process_handle(void)
 void lwip_comm_dhcp_creat(void)
 {
     
-	SYS_ARCH_DECL_PROTECT(lev);
-    
+    SYS_ARCH_DECL_PROTECT(lev);
     SYS_ARCH_PROTECT(lev);   //进入临界区
     
     //创建DHCP任务

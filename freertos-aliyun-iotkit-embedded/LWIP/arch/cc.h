@@ -28,8 +28,8 @@ typedef int sys_prot_t;				//临界保护型数据
 
 #if OS_CRITICAL_METHOD == 3  
 #define SYS_ARCH_DECL_PROTECT(lev)	u32_t lev
-#define SYS_ARCH_PROTECT(lev)		lev = taskENTER_CRITICAL_FROM_ISR() 	//进入临界区,关中断
-#define SYS_ARCH_UNPROTECT(lev)		taskEXIT_CRITICAL_FROM_ISR(lev)	        //退出临界区，开中断 
+#define SYS_ARCH_PROTECT(lev)		lev = Enter_Critical() 	//进入临界区,关中断
+#define SYS_ARCH_UNPROTECT(lev)		Exit_Critical(lev)	        //退出临界区，开中断 
 #endif
 
 //根据不同的编译器定义一些符号

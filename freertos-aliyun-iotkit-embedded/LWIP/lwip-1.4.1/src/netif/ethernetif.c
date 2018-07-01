@@ -36,8 +36,8 @@ static err_t low_level_init(struct netif *netif)
 
     /* create the task that handles the ETH_MAC */
 
-    xTaskCreate(lwip_pkt_handle, "Eth_if", netifINTERFACE_TASK_STACK_SIZE, NULL,
-                netifINTERFACE_TASK_PRIORITY,NULL); 
+//    xTaskCreate(lwip_pkt_handle, "Eth_if", netifINTERFACE_TASK_STACK_SIZE, NULL,
+//                netifINTERFACE_TASK_PRIORITY,NULL); 
     
     portENABLE_INTERRUPTS(); //重新使能中断
 #endif 
@@ -171,7 +171,9 @@ static struct pbuf * low_level_input(struct netif *netif)
 
 #if NO_SYS   
     INTX_DISABLE();
-#endif      
+#else
+    INTX_DISABLE();
+#endif    
     len=ETH_Handler.RxFrameInfos.length;                //获取接收到的以太网帧长度
     buffer=(uint8_t *)ETH_Handler.RxFrameInfos.buffer;  //获取接收到的以太网帧的数据buffer
   
@@ -221,8 +223,9 @@ static struct pbuf * low_level_input(struct netif *netif)
     
 #if NO_SYS      
     INTX_ENABLE();
+#else
+    INTX_ENABLE();    
 #endif
-    
     return p;
 }
 
