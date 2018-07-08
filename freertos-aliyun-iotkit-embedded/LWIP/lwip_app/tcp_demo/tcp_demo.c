@@ -65,7 +65,7 @@ void tcp_demo_init(void)
     printf("%s",tbuf);  
     sprintf((char*)tbuf,"Remotewo Port:%d",TCP_CLIENT_PORT);//客户端端口号
     printf("%s",tbuf);
-    printf("STATUS:Disconnected"); 
+    printf("STATUS:Disconnected\r\n"); 
     tcppcb=tcp_new();    //创建一个新的pcb
     if(tcppcb) {         //创建成功
 
@@ -93,13 +93,17 @@ void tcp_demo_init(void)
 
             tcp_client_flag&=~(1<<6);        //标记数据已经被处理了.
         } if(tcp_client_flag&1<<5)  {        //是否连接上
+            
+            
+            sprintf((char*)tbuf,"Client IP:%d.%d.%d.%d",lwipdev.remoteip[0],lwipdev.remoteip[1],lwipdev.remoteip[2],lwipdev.remoteip[3]);//客户端IP
+ 			LCD_ShowString(30,170,230,16,16,tbuf);
 
-            //printf(" STATUS:Connected\r\n   ");   //提示消息
-            //printf("Receive Data:\r\n");//提示消息        
+           // printf(" STATUS:Connected\r\n   ");   //提示消息
+          //  printf("Receive Data:\r\n");//提示消息        
 
         }else if((tcp_client_flag&1<<5)==0)
         {
-              printf("STATUS:Disconnected");
+              printf("STATUS:Disconnected\r\n");
 
         } 
 

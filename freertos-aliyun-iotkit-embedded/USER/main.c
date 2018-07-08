@@ -92,7 +92,10 @@ void show_address(u8 mode)
 }
 
 int main(void)
-{   
+{  
+    int j  = -255;
+    uint8_t i= (1-255);
+    
     Stm32_Clock_Init(360,25,2,8);   //设置时钟,180Mhz   
     HAL_Init();                     //初始化HAL库
     
@@ -201,7 +204,11 @@ void high_task(void *pvParameters)
 void middle_task(void *pvParameters)
 {
 
-    //HAL_Printf("middle_task  Running!\r\n");
+//    tcp_demo_init();
+    
+//    tcp_server_demo_init();
+    
+    http_demo();
 
 	while(1)
 	{

@@ -335,7 +335,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F429xx OTA_SIGNAL_CHANNEL</Define>
               <Undefine></Undefine>
-              <IncludePath>..\CORE;..\OBJ;..\USER;..\HALLIB\STM32F4xx_HAL_Driver\Inc;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\HARDWARE\LED;..\HARDWARE\LCD;..\HARDWARE\KEY;..\HARDWARE\SDRAM;..\HARDWARE\TIMER;..\HARDWARE\IIC;..\HARDWARE\PCF8574;..\FreeRTOS\include;..\FreeRTOS\portable\RVDS\ARM_CM4F;..\MALLOC;..\iotkit-embedded\src\log;..\iotkit-embedded\src\mqtt;..\iotkit-embedded\src\mqtt\MQTTPacket;..\iotkit-embedded\src\coap;..\iotkit-embedded\src\packages\iot-coap-c;..\iotkit-embedded\src\guider;..\iotkit-embedded\src\ota;..\iotkit-embedded\src\platform\os\freertos;..\iotkit-embedded\src\platform\ssl\freertos-mbedtls;..\iotkit-embedded\src\platform\ssl\freertos-openssl;..\iotkit-embedded\src\shadow;..\iotkit-embedded\src\system;..\iotkit-embedded\sample;..\iotkit-embedded\sample\coap;..\iotkit-embedded\sample\mqtt;..\iotkit-embedded\sample\http;..\iotkit-embedded\sample\device-shadow;..\iotkit-embedded\sample\ota;..\iotkit-embedded\src\utils\digest;..\iotkit-embedded\src\utils\misc;..\iotkit-embedded\src\utils\LITE-log;..\iotkit-embedded\src\utils\LITE-utils;..\iotkit-embedded\src\sdk-impl;..\iotkit-embedded\src\sdk-impl\exports;..\iotkit-embedded\src\sdk-impl\imports;..\iotkit-embedded\src\tfs;..\iotkit-embedded\src\platform\ssl\freertos_mbedtls_include;..\iotkit-embedded\src\utils\cjson\include;..\iotkit-embedded\src\utils\digest_algorithm;..\LWIP\lwip-1.4.1\src\include\netif;..\LWIP\lwip-1.4.1\src\include\ipv4;..\LWIP\lwip-1.4.1\src\include;..\LWIP\arch;..\LWIP\lwip_app\lwip_comm;..\LWIP;..\HARDWARE\LAN8720;..\LWIP\lwip_app\tcp_demo;..\LWIP\lwip_app\udp_demo</IncludePath>
+              <IncludePath>..\CORE;..\OBJ;..\USER;..\HALLIB\STM32F4xx_HAL_Driver\Inc;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\HARDWARE\LED;..\HARDWARE\LCD;..\HARDWARE\KEY;..\HARDWARE\SDRAM;..\HARDWARE\TIMER;..\HARDWARE\IIC;..\HARDWARE\PCF8574;..\FreeRTOS\include;..\FreeRTOS\portable\RVDS\ARM_CM4F;..\MALLOC;..\iotkit-embedded\src\log;..\iotkit-embedded\src\mqtt;..\iotkit-embedded\src\mqtt\MQTTPacket;..\iotkit-embedded\src\coap;..\iotkit-embedded\src\packages\iot-coap-c;..\iotkit-embedded\src\guider;..\iotkit-embedded\src\ota;..\iotkit-embedded\src\platform\os\freertos;..\iotkit-embedded\src\platform\ssl\freertos-mbedtls;..\iotkit-embedded\src\platform\ssl\freertos-openssl;..\iotkit-embedded\src\shadow;..\iotkit-embedded\src\system;..\iotkit-embedded\sample;..\iotkit-embedded\sample\coap;..\iotkit-embedded\sample\mqtt;..\iotkit-embedded\sample\http;..\iotkit-embedded\sample\device-shadow;..\iotkit-embedded\sample\ota;..\iotkit-embedded\src\utils\digest;..\iotkit-embedded\src\utils\misc;..\iotkit-embedded\src\utils\LITE-log;..\iotkit-embedded\src\utils\LITE-utils;..\iotkit-embedded\src\sdk-impl;..\iotkit-embedded\src\sdk-impl\exports;..\iotkit-embedded\src\sdk-impl\imports;..\iotkit-embedded\src\tfs;..\iotkit-embedded\src\platform\ssl\freertos_mbedtls_include;..\iotkit-embedded\src\utils\cjson\include;..\iotkit-embedded\src\utils\digest_algorithm;..\LWIP\lwip-1.4.1\src\include\netif;..\LWIP\lwip-1.4.1\src\include\ipv4;..\LWIP\lwip-1.4.1\src\include;..\LWIP\arch;..\LWIP\lwip_app\lwip_comm;..\LWIP;..\HARDWARE\LAN8720;..\LWIP\lwip_app\tcp_demo;..\LWIP\lwip_app\udp_demo;..\LWIP\lwip_app\http</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1690,7 +1690,7 @@
                   <RVCTZI>0</RVCTZI>
                   <RVCTOtherData>0</RVCTOtherData>
                   <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
+                  <IncludeInBuild>2</IncludeInBuild>
                   <AlwaysBuild>2</AlwaysBuild>
                   <GenerateAssemblyFile>2</GenerateAssemblyFile>
                   <AssembleAssemblyFile>2</AssembleAssemblyFile>
@@ -1722,7 +1722,7 @@
                     <vShortEn>2</vShortEn>
                     <vShortWch>2</vShortWch>
                     <v6Lto>0</v6Lto>
-                    <v6WtE>0</v6WtE>
+                    <v6WtE>2</v6WtE>
                     <v6Rtti>2</v6Rtti>
                     <VariousControls>
                       <MiscControls></MiscControls>
@@ -1738,6 +1738,11 @@
               <FileName>udp_demo.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\LWIP\lwip_app\udp_demo\udp_demo.c</FilePath>
+            </File>
+            <File>
+              <FileName>http_demo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\LWIP\lwip_app\http\http_demo.c</FilePath>
             </File>
           </Files>
         </Group>
